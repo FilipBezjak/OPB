@@ -1,0 +1,25 @@
+<!--uporabi predlogo base, ce napaka ni podana, ji daj privzeto vrednost-->
+<form action = "/prijava/" method = "post">
+    <div class="form-row">
+    <div class = "form-group col-md-6">
+        <label for = "username">Uporabnisko ime</label>
+        <input for ="username" name="username" type="text" class="form-control" required oninput="this.setCustomValidity('')"
+        oninvalid="this.setCustomValidity('Obvezno polje')"
+    />
+    <div class="form-row">
+        <div class = "form-group col-md-6">
+            <label for ="password">Geslo</label>
+            <input for ="password" name="password" type="password" class="form-control" required oninput="this.setCustomValidity('')"
+            oninvalid="this.setCustomValidity('Obvezno polje')"
+            />
+        </div>
+    <div class=""form-row d-flex justify-content-end">
+        <button class=""btn btn-primary" type = "submit">
+            Prijavi se!
+        </button>
+    </div>
+    <form
+        action="/registracija/"method="POST">
+        <input type="submit"/>
+    </form>
+</form>

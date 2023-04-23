@@ -1,0 +1,37 @@
+<!--uporabi predlogo base, ce napaka ni podana, ji daj privzeto vrednost-->
+<form action = "/registracija/" method = "post">
+    <div class="form-row">
+        <div class = "form-group col-md-6">
+            <label for = "emso">emso</label>
+            <input for ="emso" name="emso" type="text" class="form-control" required oninput="this.setCustomValidity('')"
+            oninvalid="this.setCustomValidity('Obvezno polje')"
+        />
+    </div> 
+    <div class="form-row">
+    <div class = "form-group col-md-6">
+        <label for = "username">Uporabnisko ime</label>
+        <input for ="username" name="username" type="text" class="form-control" required oninput="this.setCustomValidity('')"
+        oninvalid="this.setCustomValidity('Obvezno polje')"
+    />
+    <div class="form-row">
+        <div class = "form-group col-md-6">
+            <label for ="password">Geslo</label>
+            <input for ="password" name="password" type="password" class="form-control" required oninput="this.setCustomValidity('')"
+            oninvalid="this.setCustomValidity('Obvezno polje')"
+            />
+        </div>
+    </div>
+    <div class="form-row">
+        <div class = "form-group col-md-6">
+            <label for ="password2">Ponovno geslo</label>
+            <input for ="password2" name="password2" type="password" class="form-control" required oninput="this.setCustomValidity('')"
+            oninvalid="this.setCustomValidity('Obvezno polje')"
+            />
+        </div>
+    </div>
+    <div class=""form-row d-flex justify-content-end">
+        <button class=""btn btn-primary" type = "submit">
+            Registriraj se!
+        </button>
+    </div>
+</form>
