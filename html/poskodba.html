@@ -1,0 +1,20 @@
+<html>
+    <head>
+        <title>poškodba</title>
+    </head>
+    <body>
+        <h2>Poškodba</h2>
+        <table cellpadding="0" cellspacing="0" border="1">
+            <tr>
+                <th>Ime</th>
+                <th>Predviden čas okrevanja</th>
+            </tr>
+            %for ime, cas in poskodba:
+            <tr>
+                <td>{{ime}}</td>
+                <td>{{cas}}</td>
+            </tr>
+            %end
+        </table>
+    </body>
+</html>

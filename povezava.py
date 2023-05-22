@@ -83,31 +83,37 @@ def registracija_post():
     emso = request.forms.emso
     username = request.forms.username
     c = baza.cursor()
-    #uporabnik = None
-    #preveri, ali imamo uporabnika s tem emsom v bazi
-    # try:
-    #     uporabnik = c.execute("SELECT * from oseba WHERE emso = ?", (emso,)).fetchone()
-    # except:
-    #     uporabnik = None
-    #preverimo, da je geslo in vse previlno
-    #if uporabnik is None:
-        #nastaviSporocilo("ni emsoja")
-        #redirect('/registracija/')
     if len(password)<4:
         nastaviSporocilo("Geslo mora vsebovati vsaj 4 znake")
         redirect('/registracija/')
     if password != password2:
-        nastaviSporocilo("Gesli se ne ujemata")        
+        nastaviSporocilo("Gesli se ne ujemata")
         redirect('/registracija/')
     #zakodira geslo in ga vstavi v bazo
     zg = hashGesla(password)
     #dodamo osebo v bazo
+    print('hej')
     c.execute("insert into oseba (username, geslo, emso) values (?, ?,?)",(username, zg, emso))
     #if uporabnik is None:
     napaka = nastaviSporocilo("uspesno")
     #ko se nekdo registrira mu damo cookie
     response.set_cookie('username', username, secret = skrivnost)
     return template('html/registracija.html', napaka = napaka,cur=c)
+
+@get('/igralci')
+def igralci():
+    cur=baza.cursor()
+    igralci = cur.execute("SELECT * from igralec")
+    print(igralci)
+    return template('html/igralci.html',igralci=igralci)
+
+
+@get('/poskodba')
+def poskodba():
+    cur=baza.cursor()
+    poskodba = cur.execute("SELECT * from poskodba")
+    return template('html/poskodba.html',poskodba=poskodba)
+
 
 #geslo zakodira
 def hashGesla(geslo):
@@ -132,11 +138,12 @@ def preveriUporabnika():
 
 
 
+#se povezemo z bazo s tem 
 baza = sqlite3.connect(baza_datoteka, isolation_level= None)
 #izpise kere sql stavke posilja. Izpise v terminal
 baza.set_trace_callback(print)
 cur = baza.cursor()
-#da uposteva foreign keye
-#cur.execute("PRAGMA foreign_keys = ON;")
+#da uposteva foreign keye. Privzeto jih ne, ce tega eksplicitno ne poves
+cur.execute("PRAGMA foreign_keys = ON;")
 #vzpostavi streznik
 run(host='localhost', port = 8080, reloader=True, debug=True)
