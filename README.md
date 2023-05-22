@@ -1,2 +1,2 @@
 # OPB
-Projekt pri obdelavi podtkovnih baz.
+Projekt pri osnovi podatkovnih baz.
