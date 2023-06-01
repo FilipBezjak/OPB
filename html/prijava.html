@@ -1,25 +1,29 @@
 <!--uporabi predlogo base, ce napaka ni podana, ji daj privzeto vrednost-->
-<form action = "/prijava/" method = "post">
-    <div class="form-row">
-    <div class = "form-group col-md-6">
-        <label for = "username">Uporabnisko ime</label>
-        <input for ="username" name="username" type="text" class="form-control" required oninput="this.setCustomValidity('')"
-        oninvalid="this.setCustomValidity('Obvezno polje')"
-    />
-    <div class="form-row">
+% setdefault(napaka, '')
+% setdefault(napaka, '')
+% rebase('html/osnova.html', napaka=napaka, naslov='Prijava')
+
+<form action = "/prijava" method = "post">
+    <div class="form-row" style="width: 500px">
         <div class = "form-group col-md-6">
-            <label for ="password">Geslo</label>
-            <input for ="password" name="password" type="password" class="form-control" required oninput="this.setCustomValidity('')"
-            oninvalid="this.setCustomValidity('Obvezno polje')"
-            />
+            <label for = "username">Uporabnisko ime</label>
+            <input for ="username" name="username" type="text" class="form-control" required oninput="this.setCustomValidity('')"
+        oninvalid="this.setCustomValidity('Obvezno polje')"
+        />
         </div>
-    <div class=""form-row d-flex justify-content-end">
-        <button class=""btn btn-primary" type = "submit">
-            Prijavi se!
-        </button>
-    </div>
-    <form
-        action="/registracija/"method="POST">
-        <input type="submit"/>
-    </form>
+        </div>
+        <div class="form-row"style="width: 500px">
+            <div class = "form-group col-md-6">
+                <label for ="password">Geslo</label>
+                <input for ="password" name="password" type="password" class="form-control" required oninput="this.setCustomValidity('')"
+                oninvalid="this.setCustomValidity('Obvezno polje')"
+                />
+            </div>
+            </div>
+            <div class="gumbclass">
+                <button class="gumb" type = "submit">
+                    Prijavi se!
+                </button>
+            </div>
+            </div>
 </form>

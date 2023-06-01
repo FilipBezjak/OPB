@@ -1,18 +1,32 @@
 <!--uporabi predlogo base, ce napaka ni podana, ji daj privzeto vrednost-->
-<form action = "/registracija/" method = "post">
+% setdefault(napaka, '')
+% rebase('html/osnova.html', napaka=napaka, naslov='Registracija')
+
+<form action = "/registracija" method = "post">
     <div class="form-row">
         <div class = "form-group col-md-6">
-            <label for = "emso">emso</label>
-            <input for ="emso" name="emso" type="text" class="form-control" required oninput="this.setCustomValidity('')"
+            <label for = "ime">ime</label>
+            <input for ="ime" name="ime" type="text" class="form-control" required oninput="this.setCustomValidity('')"
             oninvalid="this.setCustomValidity('Obvezno polje')"
         />
     </div> 
+    </div>
+    <div class="form-row">
+        <div class = "form-group col-md-6">
+            <label for = "priimek">priimek</label>
+            <input for ="priimek" name="priimek" type="text" class="form-control" required oninput="this.setCustomValidity('')"
+            oninvalid="this.setCustomValidity('Obvezno polje')"
+        />
+    </div> 
+    </div>
     <div class="form-row">
     <div class = "form-group col-md-6">
-        <label for = "username">Uporabnisko ime</label>
+        <label for = "username">Uporabniško ime</label>
         <input for ="username" name="username" type="text" class="form-control" required oninput="this.setCustomValidity('')"
         oninvalid="this.setCustomValidity('Obvezno polje')"
     />
+    </div>
+    </div>
     <div class="form-row">
         <div class = "form-group col-md-6">
             <label for ="password">Geslo</label>
@@ -29,10 +43,9 @@
             />
         </div>
     </div>
-    <div class=""form-row d-flex justify-content-end">
-        <button class=""btn btn-primary" type = "submit">
+    <div class="gumbclass">
+        <button class="gumb" type = "submit">
             Registriraj se!
         </button>
     </div>
-{{napaka}}
 </form>

@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 datumi=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+#slovar, ki ga uporabimo, ko delamo tabelo ekipe
 ekipe={
 'ATL': 'Atlanta Hawks',
 'BOS': 'Boston Celtics',
@@ -12,7 +13,7 @@ ekipe={
 'DEN': 'Denver Nuggets',
 'DET': 'Detroit Pistons',
 'GSW': 'Golden State Warriors',
-'HOW': 'Houston Rockets',
+'HOU': 'Houston Rockets',
 'IND': 'Indiana Pacers',
 'LAC': 'LA Clippers',
 'LAL': 'Los Angeles Lakers',
@@ -105,36 +106,3 @@ with open("podatki/ekipe.sql","w",encoding='utf-8') as ap:
 with open("podatki/test.html",'r',encoding='utf-8') as f,open("podatki/igralec.sql","w",encoding='utf-8') as ap:
     for vr in f:
         ap.write(igralec(vr))
-
-#slovar, ki ga uporabimo, ko delamo tabelo ekipe
-ekipe={
-'ATL': 'Atlanta Hawks',
-'BOS': 'Boston Celtics',
-'BRK': 'Brooklyn Nets',
-'CHO': 'Charlotte Hornets',
-'CHI': 'Chicago Bulls',
-'CLE': 'Cleveland Cavaliers',
-'DAL': 'Dallas Mavericks',
-'DEN': 'Denver Nuggets',
-'DET': 'Detroit Pistons',
-'GSW': 'Golden State Warriors',
-'HOU': 'Houston Rockets',
-'IND': 'Indiana Pacers',
-'LAC': 'LA Clippers',
-'LAL': 'Los Angeles Lakers',
-'MEM': 'Memphis Grizzlies',
-'MIA': 'Miami Heat',
-'MIL': 'Milwaukee Bucks',
-'MIN': 'Minnesota Timberwolves',
-'NOP': 'New Orleans Pelicans',
-'NYK': 'New York Knicks',
-'OKC': 'Oklahoma City Thunder',
-'ORL': 'Orlando Magic',
-'PHI': 'Philadelphia 76ers',
-'PHO': 'Phoenix Suns',
-'POR': 'Portland Trail Blazers',
-'SAC': 'Sacramento Kings',
-'SAS': 'San Antonio Spurs',
-'TOR': 'Toronto Raptors',
-'UTA': 'Utah Jazz',
-'WAS': 'Washington Wizards'}

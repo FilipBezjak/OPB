@@ -1,0 +1,43 @@
+% setdefault(napaka, '')
+% setdefault(uporabnik, '')
+% rebase('html/osnova.html', napaka=napaka, naslov='Uporabnik', uporabnik=uporabnik)
+    <!--<form action="/uporabnik" method="post">
+        <span>Priljubljena ekipa:</span><input name="ekipa_d" type="text"/>
+        <input value="dodaj" type="submit"/>
+    </form>
+-->
+<div class="gumbclass" style="width: 500px;">
+    <button onclick="izbire_gumb()" class="gumb"> Dodaj priljubljeno ekipo</button>
+<div id="izbireGumb" class="igralci">
+    <input type="text" placeholder="Išči.." id="vnos" onkeyup="isci2()">
+    %for ekipa1, kratica in ekipe:
+  <a href="/uporabnik/{{kratica}}/dodaj">{{ekipa1}}</a>
+  %end
+</div>
+
+    <table style="width: 300px;" style="width: 200px;" class="table" data-toggle="table" style="padding: 1000px">
+        <thead>
+        <tr>
+            <th>Ekipa</th>
+            <th>Kratica</th>
+            <th style="width: 400px" >Briši</th>
+        </tr>
+    </thead>
+        %for ime, ekipa in najljubse:
+        <tr>
+            <td>{{ime}}</td>
+            <td>{{ekipa}}</td>
+            <td style="padding: 0px;" style="background-color: grey">
+                <!-- spodnji form nam da gumb {{ekipa}} pa trenutno ekipo. method post nas poslje na post(/naslov) definiran v povezava-->
+                <form action="/uporabnik/{{ekipa}}" method="post" class="gumbclass">
+                    <input class="gumb" value="Briši" type="submit"/>
+                </form>
+            </td>
+        </tr>
+        %end
+    </table>
+    <form action="/odjava" method="get">
+        <input value="odjava" type="submit"/>
+    </form>
+</body>
+</html>

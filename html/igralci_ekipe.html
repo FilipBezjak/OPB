@@ -1,0 +1,30 @@
+% rebase('html/osnova.html', napaka=napaka, uporabnik=uporabnik, naslov='Prijava')
+        % for ekipa,igralci_e in igralci:
+        <table class="table" style="width: 500px" data-toggle="table">
+            <thead>
+                {{ekipa}}
+                <th data-sortable="true" >Ime</th>
+                <th data-sortable="true" >Ekipa</th>
+                <th data-sortable="true" >Pozicija</th>
+                <th data-sortable="true" >Točke</th>
+                <th data-sortable="true" >Asistence</th>
+                <th data-sortable="true" >Skoki</th>
+                <th data-sortable="true" >Minute na tekmo</th>
+            </thead>
+                %for ime, ekipa, pozicija, tocke, asistence, skoki, odigrane_minute , poskodba,_ in igralci_e:
+            <tr>
+                %if poskodba and poskodbe:
+                <td><b>{{ime}}</b></td>
+                %else:
+                <td>{{ime}}</td>
+                %end
+                <td>{{ekipa}}</td>
+                <td>{{pozicija}}</td>
+                <td>{{tocke}}</td>
+                <td>{{asistence}}</td>
+                <td>{{skoki}}</td>
+                <td>{{odigrane_minute}}</td>
+            </tr>
+            %end
+        </table>
+        %end

@@ -1,0 +1,60 @@
+
+% rebase('html/osnova.html', napaka=napaka, uporabnik=uporabnik, naslov='Izbire')
+
+<body>
+    <div class="gumbclass">
+        <button onclick="izbire_gumb()" class="gumb">Izberi poškodovanega igralca</button>
+    <div id="izbireGumb" class="igralci">
+        <input type="text" placeholder="Išči.." id="vnos" onkeyup="isci2()">
+        %for igralec in igralci:
+      <a href="/izbire/{{igralec[0]}}">{{igralec[0]}}</a>
+      %end
+    </div>
+</div>
+</body>
+%if poskodovan:
+<div class=" gumb">
+    Poškodovan je {{poskodovan}}.
+</div>
+%if not odprej:
+%if igralci_izbire==[[],[],[]]:
+{{poskodovan}} ni zanimiv.
+%else:
+<table id="izpis" style="width: 600px" class="table" data-toggle="table">
+%for izbire, stat in zip(igralci_izbire,["Točke","Asistence","Skoki"]):
+%if izbire:
+<tr style="border-top-style: hidden;">
+    <td style="border-left-style: hidden; border-right-style: hidden;"></td>
+    <td style="border-right-style: hidden;">Pri {{stat}} zanimivi:</td>
+    <td style="border-right-style: hidden;"></td>
+    <td style="border-right-style: hidden;"></td>
+    <td style="border-right-style: hidden;"></td>
+    
+</tr>
+<tr>
+    <th>Ime</th>
+    <th>Pozicija</th>
+    <th>Točke</th>
+    <th>Asistence</th>
+    <th>Skoki</th>
+</tr>
+% for ime, _, pozicija,tocke,asistence,skoki,_,_,_ in izbire:
+    <tr style="border-bottom-style: show;">
+        <td >{{ime}}</td>
+        <td>{{pozicija}}</td>
+        <td>{{tocke}}</td>
+        <td>{{asistence}}</td>
+        <td>{{skoki}}</td>
+    </tr>
+    %end #<!-- konec for loopa izbire-->
+    %end #<!--konec if izbire-->
+    % end #<!--konec for zip loopa-->
+    
+</tbody>
+</table>
+%end #<!--konec if igralci_izbire-->
+% else:
+{{poskodovan}} je poškodovan že od prej.
+% end #<!-- konec if poskodovan-->
+
+

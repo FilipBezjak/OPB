@@ -1,7 +1,22 @@
-<form action = "/" method = "post"></form>
-
-<div class=""form-row d-flex justify-content-end">
-    <button class=""btn btn-primary" type = "submit">
-        Registriraj se!
-    </button>
+% setdefault(napaka, '')
+% setdefault(uporabnik, '')
+% rebase('html/osnova.html', napaka=napaka, naslov='Prijava', uporabnik=uporabnik)
+<div class="gumb">
+Prihajajoče tekme
 </div>
+
+<tr>
+    <table id="izpis" style="width: 400px" class="table" data-toggle="table" >
+        <thead>
+        <th data-sortable="true">Domači</th>
+        <th data-sortable="true">Gosti</th>
+        <th data-sortable="true">Datum</th>
+    </thead>
+    </tr>
+    %for domaci, gosti, cas in tekme:
+    <tr>
+        <td>{{domaci}}</td>
+        <td>{{gosti}}</td>
+        <td>{{cas}}</td>
+    </tr>
+    %end

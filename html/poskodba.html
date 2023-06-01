@@ -1,20 +1,19 @@
-<html>
-    <head>
-        <title>poškodba</title>
-    </head>
-    <body>
-        <h2>Poškodba</h2>
-        <table cellpadding="0" cellspacing="0" border="1">
-            <tr>
-                <th>Ime</th>
-                <th>Predviden čas okrevanja</th>
-            </tr>
-            %for ime, cas in poskodba:
-            <tr>
-                <td>{{ime}}</td>
-                <td>{{cas}}</td>
-            </tr>
-            %end
-        </table>
-    </body>
-</html>
+% setdefault(napaka, '')
+% rebase('html/osnova.html', napaka=napaka, naslov='Poškodba')
+
+<table id="poskodbe" class="table" data-toggle="table" style="width: 700px">
+    <thead>
+        <th data-sortable="true" >Ime</th>
+        <th data-sortable="true" >Ekipa</th>
+        <th data-sortable="true" >Čas okrevanja</th>
+    </tr>
+</thead>
+%for ime, ekipa, cas in poskodba:
+<tr>
+    <td>{{ime}}</td>
+    <td>{{ekipa}}</td>
+    <td>{{cas}}</td>
+</tr>
+%end
+</tbody>
+</table>

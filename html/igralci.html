@@ -1,30 +1,37 @@
-<html>
-    <head>
-        <title>igralci</title>
-    </head>
-    <body>
-        <h2>Igralci</h2>
-        <table cellpadding="0" cellspacing="0" border="1">
-            <tr>
-                <th>Ime</th>
-                <th>Ekipa</th>
-                <th>Pozicija</th>
-                <th>Točke</th>
-                <th>Asistence</th>
-                <th>Skoki</th>
-                <th>Povprečno število odigranih minut na tekmo</th>
-            </tr>
-            %for _, ime, ekipa, pozicija, tocke, asistence, skoki, odigrane_minute in igralci:
-            <tr>
-                <td>{{ime}}</td>
-                <td>{{ekipa}}</td>
-                <td>{{pozicija}}</td>
-                <td>{{tocke}}</td>
-                <td>{{asistence}}</td>
-                <td>{{skoki}}</td>
-                <td>{{odigrane_minute}}</td>
-            </tr>
-            %end
-        </table>
-    </body>
-</html>
+% rebase('html/osnova.html', napaka=napaka, uporabnik=uporabnik, naslov='Statistika')
+
+
+% include('html/orodna_vrstica.html', stolpci='[1,0]')
+
+<table id="izpis" class="table" style="width: 1000px;" data-toggle="table">
+    <thead>
+        <th data-sortable="true" >Ime</th>
+        <th data-sortable="true" >Ekipa</th>
+        <th data-sortable="true" >Pozicija</th>
+        <th data-sortable="true" >Točke</th>
+        <th data-sortable="true" >Asistence</th>
+        <th data-sortable="true" >Skoki</th>
+        <th data-sortable="true" >Minute na tekmo</th>
+    </tr>
+</thead>
+    %for ime, ekipa, pozicija, tocke, asistence, skoki, odigrane_minute , poskodba,_ in igralci:
+    <tr>
+        %if poskodba and poskodbe:
+        <td><b>{{ime}}</b></td>
+        %else:
+        <td>{{ime}}</td>
+        %end
+        <td>{{ekipa}}</td>
+        <td>{{pozicija}}</td>
+        <td>{{tocke}}</td>
+        <td>{{asistence}}</td>
+        <td>{{skoki}}</td>
+        <td>{{odigrane_minute}}</td>
+    </tr>
+        %end
+</tbody>
+</table>
+
+
+
+

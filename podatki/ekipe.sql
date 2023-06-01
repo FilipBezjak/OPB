@@ -8,7 +8,7 @@ insert into ekipa (ime, kratica) values ('Dallas Mavericks', 'DAL');
 insert into ekipa (ime, kratica) values ('Denver Nuggets', 'DEN');
 insert into ekipa (ime, kratica) values ('Detroit Pistons', 'DET');
 insert into ekipa (ime, kratica) values ('Golden State Warriors', 'GSW');
-insert into ekipa (ime, kratica) values ('Houston Rockets', 'HOW');
+insert into ekipa (ime, kratica) values ('Houston Rockets', 'HOU');
 insert into ekipa (ime, kratica) values ('Indiana Pacers', 'IND');
 insert into ekipa (ime, kratica) values ('LA Clippers', 'LAC');
 insert into ekipa (ime, kratica) values ('Los Angeles Lakers', 'LAL');
