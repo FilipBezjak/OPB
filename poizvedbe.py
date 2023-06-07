@@ -2,7 +2,7 @@
 
 
 def igralci(cur,ekipetf):
-    '''dobimo cursor, ekipe(true false), ki nam pove ali igralce pogrupiramo po ekipah in nacin na katerega jih razvrstimo (pozicija,tocke,asistence,skoki,odigrane)'''
+    '''dobimo cursor, ekipe(true false), ki nam pove ali igralce pogrupiramo po ekipah'''
     sez=[]
     ekipe = cur.execute("SELECT kratica from ekipa").fetchall()
     if ekipetf:

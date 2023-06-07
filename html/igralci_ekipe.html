@@ -1,8 +1,45 @@
-% rebase('html/osnova.html', napaka=napaka, uporabnik=uporabnik, naslov='Prijava')
+% rebase('html/osnova.html', napaka=napaka, uporabnik=uporabnik, naslov='Statistika')
+
+
+
+<script>function redirect_ekipe() {
+    let currentURL = window.location.href;
+    let poskodbe = currentURL.charAt(currentURL.length - 1);
+    let ekipe = currentURL.charAt(currentURL.length - 2);
+    if (poskodbe=="f") {
+        redirectTo = currentURL.replace("http://localhost:8080/igralci/tf", "http://localhost:8080/igralci/ff");
+        window.location.href = redirectTo;
+        }
+    else {
+        redirectTo = currentURL.replace("http://localhost:8080/igralci/tt", "http://localhost:8080/igralci/ft");
+        window.location.href = redirectTo;
+        }
+    }
+function redirect_poskodbe(){
+    let currentURL = window.location.href;
+    let poskodbe = currentURL.charAt(currentURL.length - 1);
+    let ekipe = currentURL.charAt(currentURL.length - 2);
+    if (poskodbe=="f") {
+        redirectTo = currentURL.replace("http://localhost:8080/igralci/tf", "http://localhost:8080/igralci/tt");
+        window.location.href = redirectTo;
+        }
+    else {
+        redirectTo = currentURL.replace("http://localhost:8080/igralci/tt", "http://localhost:8080/igralci/tf");
+        window.location.href = redirectTo;
+        }
+    }
+ </script>
+
+
+<div class="gumbclass"  style="margin-bottom: 20px;">
+<a onclick="redirect_poskodbe()" class="gumb" >Pokaži poškodovane</a>
+<a onclick="redirect_ekipe()" class="gumb">Razvrsti po ekipah</a>
+</div>
+
         % for ekipa,igralci_e in igralci:
+        <div class="gumb">{{ekipa}}</div>
         <table class="table" style="width: 500px" data-toggle="table">
             <thead>
-                {{ekipa}}
                 <th data-sortable="true" >Ime</th>
                 <th data-sortable="true" >Ekipa</th>
                 <th data-sortable="true" >Pozicija</th>

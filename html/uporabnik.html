@@ -1,18 +1,17 @@
 % setdefault(napaka, '')
 % setdefault(uporabnik, '')
 % rebase('html/osnova.html', napaka=napaka, naslov='Uporabnik', uporabnik=uporabnik)
-    <!--<form action="/uporabnik" method="post">
-        <span>Priljubljena ekipa:</span><input name="ekipa_d" type="text"/>
-        <input value="dodaj" type="submit"/>
-    </form>
--->
+
+
+
 <div class="gumbclass" style="width: 500px;">
-    <button onclick="izbire_gumb()" class="gumb"> Dodaj priljubljeno ekipo</button>
-<div id="izbireGumb" class="igralci">
-    <input type="text" placeholder="Išči.." id="vnos" onkeyup="isci2()">
-    %for ekipa1, kratica in ekipe:
-  <a href="/uporabnik/{{kratica}}/dodaj">{{ekipa1}}</a>
-  %end
+    <button   onclick="izbire_gumb()" class="gumb"> Dodaj priljubljeno ekipo</button>
+    <div id="izbireGumb" class="igralci">
+        <input type="text" placeholder="Išči.." id="vnos" onkeyup="isci2()">
+% for ime, kratica in ekipe:
+        <a href="/uporabnik/{{kratica}}/dodaj">{{ime}}</a>
+        %end
+    </div>
 </div>
 
     <table style="width: 300px;" style="width: 200px;" class="table" data-toggle="table" style="padding: 1000px">
@@ -23,7 +22,8 @@
             <th style="width: 400px" >Briši</th>
         </tr>
     </thead>
-        %for ime, ekipa in najljubse:
+  
+% for ime, ekipa in najljubse:
         <tr>
             <td>{{ime}}</td>
             <td>{{ekipa}}</td>
@@ -36,8 +36,5 @@
         </tr>
         %end
     </table>
-    <form action="/odjava" method="get">
-        <input value="odjava" type="submit"/>
-    </form>
 </body>
 </html>

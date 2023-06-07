@@ -19,8 +19,7 @@
 
 
 
-    /* When the user clicks on the button,
-toggle between hiding and showing the dropdown content */
+    /* da se pokažejo izbire ko kliknemo */
 function izbire_gumb() {
     document.getElementById("izbireGumb").classList.toggle("show");
   }
@@ -42,3 +41,28 @@ function izbire_gumb() {
       }
     }
   }
+
+  function redirect_ekipe() {
+    let currentURL = window.location.href;
+    let poskodbe = currentURL.charAt(currentURL.length - 1);
+    if (poskodbe="f") {
+        redirectTo = currentURL.replace("http://localhost:8080/igralci/ff", "http://localhost:8080/igralci/tf");
+        window.location.href = redirectTo;
+    }
+    else {
+        redirectTo = currentURL.replace("http://localhost:8080/igralci/ft", "http://localhost:8080/igralci/tt");
+        window.location.href = redirectTo;
+    }
+}    
+function redirect_poskodbe() {
+    let currentURL = window.location.href;
+    let ekipe = currentURL.charAt(currentURL.length - 2);
+    if (ekipe="f") {
+        let redirectTo = currentURL.replace("http://localhost:8080/igralci/ff", "http://localhost:8080/igralci/ft");
+        window.location.href = redirectTo;
+    }
+    else {
+        let redirectTo = currentURL.replace("http://localhost:8080/igralci/tf", "http://localhost:8080/igralci/tt");
+        window.location.href = redirectTo;
+    }
+} 

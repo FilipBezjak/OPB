@@ -29,15 +29,8 @@ def static(filename):
     return static_file(filename, root=static_dir)
 
 @get('/')
-def prijava():
+def zacetna():
     cur=baza.cursor()
-    cur.execute("insert into tekme (ekipa1, ekipa2, cas) values ('UTA', 'MIL', '2023-05-21')")
-    cur.execute("insert into tekme (ekipa1, ekipa2, cas) values ('UTA', 'GSW', '2023-05-21')")
-    cur.execute("insert into tekme (ekipa1, ekipa2, cas) values ('UTA', 'MIL', '2023-05-21')")
-    cur.execute("insert into tekme (ekipa1, ekipa2, cas) values ('LAL', 'DEN', '2023-05-21')")
-    cur.execute("insert into tekme (ekipa1, ekipa2, cas) values ('UTA', 'MIA', '2023-05-21')")
-    cur.execute("insert into tekme (ekipa1, ekipa2, cas) values ('UTA', 'BOS', '2023-05-21')")
-    cur.execute("insert into tekme (ekipa1, ekipa2, cas) values ('HOU', 'MIL', '2023-05-21')")
     tekme= cur.execute(f"""SELECT *  FROM tekme order by cas desc limit 10""")
     return template('html/zacetna.html', napaka=nastaviSporocilo(),uporabnik=preveriUporabnika(), tekme=tekme)
 
@@ -69,38 +62,40 @@ def izbire_igralec(poskodovan):
     #potem še vrnemo vse ki igrajo na isti poziciji.
     return template('html/izbire.html', poskodovan=poskodovan ,igralci=igralci,igralci_izbire=igralci_izbire, napaka = "", uporabnik=preveriUporabnika(), odprej=odprej)
 
+def neki():
+    print("hej")
 
 @get('/igralci/<sort>')
 def igralci(sort):
     ekipe, poskodbe=sort[0],sort[1]
+    url=request.url
     if poskodbe=="f":
         poskodbe=None
     cur=baza.cursor()
     if ekipe=='t':
         igralci = poizvedbe.igralci(cur,True)
-        return template('html/igralci_ekipe.html',igralci=igralci, poskodbe=poskodbe,uporabnik=preveriUporabnika(), napaka="")
+        return template('html/igralci_ekipe.html',url=url,igralci=igralci, poskodbe=poskodbe,uporabnik=preveriUporabnika(), napaka="")
     else:
         igralci = poizvedbe.igralci(cur,False)
-        return template('html/igralci.html',igralci=igralci, poskodbe=poskodbe, napaka=nastaviSporocilo(),uporabnik=preveriUporabnika())
+        return template('html/igralci.html',url=url,igralci=igralci, poskodbe=poskodbe, napaka=nastaviSporocilo(),uporabnik=preveriUporabnika())
 
 
-@get('/poskodba/<sort>')
-def poskodba(sort):
+@get('/poskodba')
+def poskodba():
     uporabnik=preveriUporabnika()
     cur=baza.cursor()
-    #sortamo po igralec ime ali pa po kratici ekipe, privzeto je po kratici ekipe.
-    if sort!='cas':
-        sort='igralec.'+sort
-    poskodba = cur.execute(f"""SELECT igralec.ime, ekipa.ime, cas  FROM poskodba JOIN igralec ON igralec.ime = poskodba.ime JOIN ekipa on ekipa.kratica=igralec.ekipa ORDER BY {sort}""")
+    poskodba = cur.execute(f"""SELECT igralec.ime, ekipa.ime, cas  FROM poskodba JOIN igralec ON igralec.ime = poskodba.ime JOIN ekipa on ekipa.kratica=igralec.ekipa""")
     return template('html/poskodba.html',poskodba=poskodba, napaka=nastaviSporocilo(), uporabnik=uporabnik)
 
 @get('/uporabnik')
 def uporabik():
+    print("hej18")
     uporabnik=preveriUporabnika()
     cur=baza.cursor()
-    ekipe= cur.execute(f"""SELECT ime,kratica from ekipa left join najljubse on najljubse.ekipa=ekipa.kratica where clovek!='{uporabnik}'""")
-    najljubse = cur.execute(f"""SELECT ekipa.ime, ekipa FROM najljubse JOIN oseba ON najljubse.clovek = oseba.username JOIN ekipa on ekipa.kratica=najljubse.ekipa WHERE username='{uporabnik}'""")
-    return template('html/uporabnik.html', najljubse=najljubse, napaka=nastaviSporocilo(), uporabnik=uporabnik, ekipe=ekipe)
+    ekipe= cur.execute(f"""SELECT ime,kratica from ekipa left join najljubse on najljubse.ekipa=ekipa.kratica where clovek!='{uporabnik}' or clovek is null""").fetchall()
+    najljubse = cur.execute(f"""SELECT ekipa.ime, ekipa FROM najljubse JOIN oseba ON najljubse.clovek = oseba.username JOIN ekipa on ekipa.kratica=najljubse.ekipa WHERE username='{uporabnik}'""").fetchall()
+    #na koncu nujno fetchall, sicer ga html ne zna prebrati
+    return template('html/uporabnik.html', najljubse=najljubse, napaka=nastaviSporocilo(), uporabnik=uporabnik, ekipe=ekipe, cur=cur)
 
     
 @get('/uporabnik/<ekipa>/dodaj')
@@ -137,6 +132,7 @@ def prijava_get():
 def prijava_post():
     username = request.forms.username
     password = request.forms.password
+    print(password)
     if username is None or password is None:
         nastaviSporocilo("nekaj si pustli prazno")
         redirect('/prijava')
@@ -146,10 +142,10 @@ def prijava_post():
     # je treba izbrati prvega
     # pogledamo, ce je uporabnik v bazi
     try:
-        print(username)
-        print(password)
-        gesloHash = hashGesla(c.execute(f"""SELECT geslo FROM oseba WHERE username =  '{username}'""").fetchone()[0])
+        gesloHash = c.execute(f"""SELECT geslo FROM oseba WHERE username =  '{username}'""").fetchone()[0]
+        print(gesloHash)
     except:
+        print("geslohashnon")
         gesloHash = None
     if gesloHash==None:
         nastaviSporocilo("Uporabnik ne obstaja")
@@ -192,12 +188,20 @@ def registracija_post():
     #zakodira geslo in ga vstavi v bazo
     zg = hashGesla(password)
     #dodamo osebo v bazo
-    c.execute("insert into oseba (username, geslo, ime, priimek) values (?, ?,?,?)",(username, zg, ime, priimek))
+    try:
+        c.execute("insert into oseba (username, geslo, ime, priimek) values (?, ?,?,?)",(username, zg, ime, priimek))
+        print("hej1")
     #if uporabnik is None:
-    napaka = nastaviSporocilo("Uspešno")
+        napaka = nastaviSporocilo("Uspešno")
+        print("hej12")
     #ko se nekdo registrira mu damo cookie
-    response.set_cookie('username', username, secret = skrivnost)
+        response.set_cookie('username', username, secret = skrivnost)
+    except:
+        # če je uporabniško ime zasedeno
+        napaka = nastaviSporocilo("Uporabniško ime že obstaja")
+        redirect('/registracija')
     redirect('/uporabnik')
+
 
 #geslo zakodira
 def hashGesla(geslo):
