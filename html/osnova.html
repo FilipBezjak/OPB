@@ -33,33 +33,34 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ml-auto">
             %if uporabnik:
-            <li>
+          <li>
             <span class="navbar-text">Živjo {{uporabnik}}!</span>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/uporabnik">Uporabniški profil</a>
+            <a class="nav-link" href="{{url('uporabnik_get')}}">Uporabniški profil</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{url('odjava_get')}}">Odjava</a>
           </li>
           %else:
           <li class="nav-item">
-            <a class="nav-link" href="/prijava">Prijava</a>
+            <a class="nav-link" href="{{url('prijava_get')}}">Prijava</a>
           </li>
           %end
             <li class="nav-item">
-              <a class="nav-link" href="/">Domov</a>
+              <a class="nav-link" href="{{url('zacetna_get')}}">Domov</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/poskodba">Poškodbe</a>
+              <a class="nav-link" href="{{url('poskodba_get')}}">Poškodbe</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/izbire">Izbire</a>
+              <a class="nav-link" href="{{url('izbire_get')}}">Izbire</a>
             </li> 
             <li class="nav-item">
-              <a class="nav-link" href="/igralci/ff">Statistika</a>
-            </li>            <li class="nav-item">
-              <a class="nav-link" href="/odjava">Odjava</a>
-            </li>
+        <a class="nav-link" href="{{url('igralci', sort='ff')}}">Statistika</a>
+            </li>            
             <li class="nav-item">
-              <a class="nav-link" href="/registracija">Registracija</a>
+              <a class="nav-link" href="{{url('registracija_get')}}">Registracija</a>
             </li>
             
           </ul>

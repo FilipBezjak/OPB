@@ -13,7 +13,7 @@
     <div id="izbireGumb" class="igralci">
         <input type="text" placeholder="Išči.." id="vnos" onkeyup="isci2()">
 % for ime, kratica in ekipe:
-        <a href="/uporabnik/{{kratica}}/dodaj">{{ime}}</a>
+        <a href="{{url('uporabnik_ekipa_dodaj', ekipa=kratica)}}">{{ime}}</a>
         %end
     </div>
 </div>
@@ -33,7 +33,7 @@
             <td>{{ekipa}}</td>
             <td style="padding: 0px;" style="background-color: grey">
                 <!-- spodnji form nam da gumb {{ekipa}} pa trenutno ekipo. method post nas poslje na post(/naslov) definiran v povezava-->
-                <form action="/uporabnik/{{ekipa}}" method="post" class="gumbclass">
+                <form action="{{url('uporabnik_ekipa', ekipa=ekipa)}}" method="post" class="gumbclass">
                     <input class="gumb" value="Briši" type="submit"/>
                 </form>
             </td>

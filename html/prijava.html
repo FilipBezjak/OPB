@@ -3,7 +3,7 @@
 % setdefault(napaka, '')
 % rebase('html/osnova.html', napaka=napaka, naslov='Prijava')
 
-<form action = "/prijava" method = "post">
+<form action = "{{url('prijava_post')}}" method = "post">
     <div class="form-row" style="width: 500px">
         <div class = "form-group col-md-6">
             <label for = "username">Uporabnisko ime</label>

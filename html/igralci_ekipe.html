@@ -1,5 +1,4 @@
 % rebase('html/osnova.html', napaka=napaka, uporabnik=uporabnik, naslov='Statistika')
-% ekipe, poskodbetf =url[-2], url[-1]
 
 
 <style>
@@ -8,49 +7,24 @@
     }
 </style>
 
-
-<script>function redirect_ekipe() {
-    let currentURL = window.location.href;
-    let poskodbe = currentURL.charAt(currentURL.length - 1);
-    let ekipe = currentURL.charAt(currentURL.length - 2);
-    if (poskodbe=="f") {
-        redirectTo = currentURL.replace("http://localhost:8080/igralci/tf", "http://localhost:8080/igralci/ff");
-        window.location.href = redirectTo;
-        }
-    else {
-        redirectTo = currentURL.replace("http://localhost:8080/igralci/tt", "http://localhost:8080/igralci/ft");
-        window.location.href = redirectTo;
-        }
-    }
-function redirect_poskodbe(){
-    let currentURL = window.location.href;
-    let poskodbe = currentURL.charAt(currentURL.length - 1);
-    let ekipe = currentURL.charAt(currentURL.length - 2);
-    if (poskodbe=="f") {
-        redirectTo = currentURL.replace("http://localhost:8080/igralci/tf", "http://localhost:8080/igralci/tt");
-        window.location.href = redirectTo;
-        }
-    else {
-        redirectTo = currentURL.replace("http://localhost:8080/igralci/tt", "http://localhost:8080/igralci/tf");
-        window.location.href = redirectTo;
-        }
-    }
- </script>
-
-
- <div class="gumbclass"  style="margin-bottom: 20px;">
-    %if poskodbetf=="t":
-    <a style='color: rgb(117, 223, 117);' onclick="redirect_poskodbe()" class="gumb" >Pokaži poškodovane</a>
+<div class="gumbclass"  style="margin-bottom: 20px;">
+    %if poskodbe==True:
+    <!-- T    |  F-->
+    <form action="{{url('igralci', sort='ft')}}" method="get" class="gumbclass">
+        <input style='color: rgb(117, 223, 117);'   class="gumb" value="Razvrsti po ekipah" type="submit"/>
+    </form>
+    <form    action="{{url('igralci', sort='tf')}}" method="get" class="gumbclass">
+        <input  style='color: rgb(117, 223, 117);'  class="gumb" value="Prikaži poškodovane" type="submit"/>
+    </form>
     %else:
-    <a style='color: rgb(205, 92, 92);' onclick="redirect_poskodbe()" class="gumb" >Pokaži poškodovane</a>
-    %end
-    %if ekipe=="t":
-    <a style='color: rgb(117, 223, 117);' onclick="redirect_ekipe()" class="gumb">Razvrsti po ekipah</a>
-    %else:
-    <a style='color: rgb(205, 92, 92);' onclick="redirect_ekipe()" class="gumb">Razvrsti po ekipah</a>
+    <form action="{{url('igralci', sort='ff')}}" method="get" class="gumbclass">
+        <input style='color: rgb(117, 223, 117);'   class="gumb" value="Razvrsti po ekipah" type="submit"/>
+    </form>
+    <form    action="{{url('igralci', sort='tt')}}" method="get" class="gumbclass">
+        <input  style='color: rgb(228, 119, 119);'  class="gumb" value="Prikaži poškodovane" type="submit"/>
+    </form>
     %end
     </div>
-
 
         % for ekipa,igralci_e in igralci:
         <div class="gumb">{{ekipa}}</div>

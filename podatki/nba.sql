@@ -8,11 +8,11 @@ DROP TABLE IF EXISTS ekipa;
 
 
 CREATE TABLE oseba (
-    ime VARCHAR(20) NOT NULL,
-    priimek VARCHAR(20) NOT NULL,
-    username VARCHAR(25) PRIMARY KEY,
-    geslo VARCHAR(20) NOT NULL,
-    adminstrator BOOLEAN NOT NULL DEFAULT (0)
+    ime TEXT NOT NULL,
+    priimek TEXT NOT NULL,
+    username TEXT PRIMARY KEY,
+    geslo TEXT NOT NULL,
+    adminstrator BOOLEAN NOT NULL DEFAULT (FALSE)
 );
 
 CREATE TABLE ekipa (
@@ -21,7 +21,7 @@ CREATE TABLE ekipa (
 );
 
 CREATE TABLE najljubse (
-    clovek VARCHAR(25) REFERENCES oseba(username),
+    clovek TEXT REFERENCES oseba(username) ON DELETE CASCADE,
     ekipa VARCHAR(3) REFERENCES ekipa(kratica)
 );
 

@@ -3,7 +3,7 @@ import hashlib
 import tracemalloc
 import poizvedbe
 #poizvedbe v bazo delamo v drugi datoteki
-
+tracemalloc.start()
 
 # uvozimo bottle.py
 from bottleext import *
@@ -19,7 +19,9 @@ psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
 SERVER_PORT = os.environ.get('BOTTLE_PORT', 8080)
 RELOADER = os.environ.get('BOTTLE_RELOADER', True)
 DB_PORT = os.environ.get('POSTGRES_PORT', 5432)
+ROOT = os.environ.get('BOTTLE_ROOT', '/')
 
+debug(True)
 
 #tracemalloc.start()
 #bazo smo naredili v priklop 
@@ -43,105 +45,136 @@ def static(filename):
     return static_file(filename, root=static_dir)
 
 @get('/')
-def zacetna():
+def zacetna_get():
     cur=baza.cursor()
-    tekme= cur.execute(f"""SELECT *  FROM tekme order by cas desc limit 10""")
+    cur.execute(f"""SELECT *  FROM tekme order by cas desc limit 10""")
+    tekme=cur
+    baza.commit()
     return template('html/zacetna.html', napaka=nastaviSporocilo(),uporabnik=preveriUporabnika(), tekme=tekme)
 
 @get('/izbire')
-def izbire():
+def izbire_get():
     cur=baza.cursor()
-    igralci=cur.execute("SELECT * from igralec")
-    return template('html/izbire.html',poskodovan=None, igralci=igralci, igralci_izbire=None ,napaka = "", uporabnik=None, )
+    cur.execute("SELECT * from igralec")
+    return template('html/izbire.html',poskodovan=None, igralci=cur, igralci_izbire=None ,napaka = "", uporabnik=None, )
 
 
 
 @get('/izbire/<poskodovan>')
 def izbire_igralec(poskodovan):
     cur=baza.cursor()
+    #pogledamo, če je poškodovan že od prej,
     odprej=False
-    try:
-        cur.execute(f"""SELECT * from poskodba where ime='{poskodovan}'""").fetchall()[0]
+    cur.execute(f"""SELECT * from poskodba where ime='{poskodovan}'""")
+    if cur.fetchall():
         odprej=True
-    except:
-        odprej=False
-    print(odprej)
     #poiščemo pri kateri ekipi igra in izberemo prve 3 po točkah v tej ekipi, ki niso poškodovani. Če je naš igralec med prvmi tremi, vrnemo druga dva, če ga ni, ni zanimiv. Isto ponovimo še za asistence in skoke
-    igralci=cur.execute("SELECT * from igralec").fetchall()
-    ekipa=cur.execute(f"""SELECT ekipa from igralec where ime = '{poskodovan}'""").fetchone()[0]
-    igralciT=poizvedbe.izbire(ekipa, cur,poskodovan, 'tocke')
-    igralciA=poizvedbe.izbire(ekipa, cur,poskodovan, 'asistence')
-    igralciS=poizvedbe.izbire(ekipa, cur,poskodovan, 'skoki')
+    cur=baza.cursor()
+    cur.execute("SELECT * from igralec")
+    igralci=cur
+    cur=baza.cursor()
+    cur.execute(f"""SELECT ekipa from igralec where ime = '{poskodovan}'""")
+    ekipa=cur
+    igralciT=poizvedbe.izbire(ekipa, baza,poskodovan, 'tocke')
+    igralciA=poizvedbe.izbire(ekipa, baza,poskodovan, 'asistence')
+    igralciS=poizvedbe.izbire(ekipa, baza,poskodovan, 'skoki')
     igralci_izbire=[igralciT,igralciA,igralciS]
+    baza.commit()
     #potem še vrnemo vse ki igrajo na isti poziciji.
     return template('html/izbire.html', poskodovan=poskodovan ,igralci=igralci,igralci_izbire=igralci_izbire, napaka = "", uporabnik=preveriUporabnika(), odprej=odprej)
 
-def neki():
-    print("hej")
 
 @get('/igralci/<sort>')
 def igralci(sort):
+    #na konec urlja dobimo tf, ki nam pove, če pokažemo poškodovane oziroma razvrstimo po ekipah
     ekipe, poskodbe=sort[0],sort[1]
-    url=request.url
     if poskodbe=="f":
-        poskodbe=None
-    cur=baza.cursor()
-    if ekipe=='t':
-        igralci = poizvedbe.igralci(cur,True)
-        return template('html/igralci_ekipe.html',poekipah=True,url=url,igralci=igralci, poskodbe=poskodbe,uporabnik=preveriUporabnika(), napaka="")
+        poskodbe=False
     else:
-        igralci = poizvedbe.igralci(cur,False)
-        return template('html/igralci.html',poekipah=False,url=url,igralci=igralci, poskodbe=poskodbe, napaka=nastaviSporocilo(),uporabnik=preveriUporabnika())
+        poskodbe=True
+    if ekipe=='t':
+        igralci = poizvedbe.igralci(baza,True)
+        baza.commit()
+        return template('html/igralci_ekipe.html',poekipah=True,igralci=igralci, poskodbe=poskodbe,uporabnik=preveriUporabnika(), napaka="")
+    else:
+        igralci = poizvedbe.igralci(baza,False)
+        baza.commit()
+        return template('html/igralci.html',poekipah=False,igralci=igralci, poskodbe=poskodbe, napaka=nastaviSporocilo(),uporabnik=preveriUporabnika())
 
 
 @get('/poskodba')
-def poskodba():
+def poskodba_get():
     uporabnik=preveriUporabnika()
     cur=baza.cursor()
-    poskodba = cur.execute(f"""SELECT igralec.ime, ekipa.ime, cas  FROM poskodba JOIN igralec ON igralec.ime = poskodba.ime JOIN ekipa on ekipa.kratica=igralec.ekipa""")
-    return template('html/poskodba.html',poskodba=poskodba, napaka=nastaviSporocilo(), uporabnik=uporabnik)
+    cur.execute(f"""SELECT igralec.ime, ekipa.ime, cas  FROM poskodba JOIN igralec ON igralec.ime = poskodba.ime JOIN ekipa on ekipa.kratica=igralec.ekipa""")
+    baza.commit()
+    return template('html/poskodba.html',poskodba=cur, napaka=nastaviSporocilo(), uporabnik=uporabnik)
+
+
+#########STRAN UPORABNIK
 
 @get('/uporabnik')
-def uporabnik():
+def uporabnik_get():
     uporabnik=preveriUporabnika()
-    cur=baza.cursor()
-    ekipe= cur.execute(f"""SELECT ime,kratica from ekipa left join najljubse on najljubse.ekipa=ekipa.kratica where clovek!='{uporabnik}' or clovek is null""").fetchall()
-    najljubse = cur.execute(f"""SELECT ekipa.ime, ekipa FROM najljubse JOIN oseba ON najljubse.clovek = oseba.username JOIN ekipa on ekipa.kratica=najljubse.ekipa WHERE username='{uporabnik}'""").fetchall()
-    top3TAS=poizvedbe.top3tas(cur,uporabnik)
-    # nam da top 3 pri pike asistence, skoki pri najljubsih, kot [[brooklyn nets,[[[igralec1, #pik],[igralec2, #pik],[igralec3, #pik]][igralec1, #ast],[...],]
-    #na koncu nujno fetchall, sicer ga html ne zna prebrati
-    return template('html/uporabnik.html',top3TAS=top3TAS, najljubse=najljubse, napaka=nastaviSporocilo(), uporabnik=uporabnik, ekipe=ekipe, cur=cur)
+    if uporabnik:
+        cur=baza.cursor()
+        cur.execute(f"""SELECT ime,kratica from ekipa left join najljubse on najljubse.ekipa=ekipa.kratica where clovek!='{uporabnik}' or clovek is null""")
+        ekipe = cur
+        cur=baza.cursor()
+        cur.execute(f"""SELECT ekipa.ime, ekipa FROM najljubse JOIN oseba ON najljubse.clovek = oseba.username JOIN ekipa on ekipa.kratica=najljubse.ekipa WHERE username='{uporabnik}'""")
+        najljubse = cur
+        top3TAS=poizvedbe.top3tas(baza,uporabnik)
+        baza.commit()
+        # nam da top 3 pri pike asistence, skoki pri najljubsih, kot [[brooklyn nets,[[[igralec1, #pik],[igralec2, #pik],[igralec3, #pik]][igralec1, #ast],[...],]
+        #na koncu nujno fetchall, sicer ga html ne zna prebrati
+        return template('html/uporabnik.html',top3TAS=top3TAS, najljubse=najljubse, napaka=nastaviSporocilo(), uporabnik=uporabnik, ekipe=ekipe, cur=cur)
+    else:
+        return "Nisi prijavljen"
 
     
 @get('/uporabnik/<ekipa>/dodaj')
-def dodaj_ekipo(ekipa):
+def uporabnik_ekipa_dodaj(ekipa):
     #na zacetku nastavimo sporocilo na none
     nastaviSporocilo()
     uporabnik=preveriUporabnika()
     cur=baza.cursor()
     try:
         cur.execute(f"""insert into najljubse (clovek, ekipa) values ('{uporabnik}', '{ekipa}')""")
+        baza.commit()
     except:
         #nastavimo sporocilo
         nastaviSporocilo(f"{ekipa} ni ime ekipe")
-    redirect(url('/uporabnik'))
-
-
-@get('/adminstrator')
-def admin():
+    redirect(url('uporabnik_get'))
+    
+#<ekipa> nam da vrednost ekipe pri brisi
+@post('/uporabnik/<ekipa>')
+def uporabnik_ekipa(ekipa):
     uporabnik=preveriUporabnika()
     cur=baza.cursor()
-    priljubljenost = poizvedbe.pril(cur)
-    osebe=cur.execute("SELECT * from oseba").fetchall()
+    cur.execute(f"""delete from najljubse where clovek='{uporabnik}' and ekipa='{ekipa}'""")
+    baza.commit()
+    redirect(url('uporabnik_get'))
+    
+################# ADMINSTRATOR PAGE########33
+
+@get('/adminstrator')
+def adminstrtor_get():
+    uporabnik=preveriUporabnika()
+    priljubljenost = poizvedbe.pril(baza)
+    cur=baza.cursor()
+    cur.execute("SELECT * from oseba")
+    osebe=cur.fetchall()
+    baza.commit()
     return template('html/adminstrator.html', uporabnik=uporabnik,osebe=osebe, priljubljenost=priljubljenost, napaka=None)
 
 @post('/adminstrator')
-def admin():
+def adminstrator_post():
     domaci = request.forms.domaci
     gosti = request.forms.gosti
     datum = request.forms.datum
     cur=baza.cursor()
     cur.execute(f"""INSERT into tekme (ekipa1, ekipa2, cas) values ('{domaci}', '{gosti}', '{datum}')""")
+    baza.commit()
     redirect(url('/adminstrator'))
     
     
@@ -149,18 +182,11 @@ def admin():
 def admin(uporabnik):
     cur=baza.cursor()
     cur.execute(f"""DELETE from oseba where username='{uporabnik}'""")
+    baza.commit()
     redirect(url('/adminstrator'))
-    #dodaj se trigerje
-    
-#<ekipa> nam da vrednost ekipe pri brisi
-@post('/uporabnik/<ekipa>')
-def brisi(ekipa):
-    uporabnik=preveriUporabnika()
-    cur=baza.cursor()
-    cur.execute(f"""delete from najljubse where clovek='{uporabnik}' and ekipa='{ekipa}'""")
-    redirect(url('/uporabnik'))
 
-###registracija in prijava.
+
+####################33###registracija in prijava.
 
 @get('/prijava')
 def prijava_get():
@@ -172,30 +198,31 @@ def prijava_get():
 def prijava_post():
     username = request.forms.username
     password = request.forms.password
-    print(password)
     if username is None or password is None:
         nastaviSporocilo("nekaj si pustli prazno")
         redirect(url('/prijava'))
-    c = baza.cursor()
     gesloHash = None
     #pazi, vejica za username in cursor vrne tuple, zato 
     # je treba izbrati prvega
     # pogledamo, ce je uporabnik v bazi
     try:
-        gesloHash = c.execute(f"""SELECT geslo FROM oseba WHERE username =  '{username}'""").fetchone()[0]
-        print(gesloHash)
+        cur=baza.cursor()
+        cur.execute(f"""SELECT geslo FROM oseba WHERE username =  '{username}'""")
+        gesloHash=cur
+        baza.commit()
     except:
-        print("geslohashnon")
         gesloHash = None
     if gesloHash==None:
         nastaviSporocilo("Uporabnik ne obstaja")
+        baza.commit()
         redirect(url('/prijava'))
         #pogledamo, ali je geslo pravilno
     if hashGesla(password) != gesloHash:
         nastaviSporocilo("Napačno geslo")
+        baza.commit()
         redirect(url("/prijava"))
     response.set_cookie('username', username, secret=skrivnost)
-    redirect(url('/uporabnik'))
+    redirect(url('uporabnik_get'))
     
 @get('/odjava')
 def odjava_get():
@@ -218,7 +245,6 @@ def registracija_post():
     ime = request.forms.ime
     priimek = request.forms.priimek
     username = request.forms.username
-    c = baza.cursor()
     if len(password)<4:
         nastaviSporocilo("Geslo mora vsebovati vsaj 4 znake")
         redirect(url('/registracija'))
@@ -229,18 +255,18 @@ def registracija_post():
     zg = hashGesla(password)
     #dodamo osebo v bazo
     try:
-        c.execute("insert into oseba (username, geslo, ime, priimek) values (?, ?,?,?)",(username, zg, ime, priimek))
-        print("hej1")
+        c = baza.cursor()
+        c.execute("""insert into oseba (username, geslo, ime, priimek) values (%s, %s,%s,%s)""",(username,zg,ime,priimek))
+        baza.commit()
     #if uporabnik is None:
         napaka = nastaviSporocilo("Uspešno")
-        print("hej12")
     #ko se nekdo registrira mu damo cookie
         response.set_cookie('username', username, secret = skrivnost)
     except:
         # če je uporabniško ime zasedeno
         napaka = nastaviSporocilo("Uporabniško ime že obstaja")
         redirect(url('/registracija'))
-    redirect(url('/uporabnik'))
+    redirect(url('uporabnik_get'))
 
 
 #geslo zakodira
@@ -249,6 +275,7 @@ def hashGesla(geslo):
     m.update(geslo.encode("utf-8"))
     return m.hexdigest()
 
+#######################3
 def preveriUporabnika():
     #dobi username tistega, ki trenutno uporablja stran
     username = request.get_cookie("username", secret=skrivnost)
@@ -257,13 +284,22 @@ def preveriUporabnika():
         uporabnik = None
         #poisce username v tabeli oseba
         try:
-            uporabnik = c.execute(f"""SELECT * from oseba WHERE username = '{username}'""").fetchone()[0]
+            c.execute(f"""SELECT * from oseba WHERE username = '{username}'""")
+            uporabnik = c
+            baza.commit()
         except:
             uporabnik = None
         #ce ga najde, vrne username
         if uporabnik:
             return username
     return None
+
+
+#ko preklopimo na postgres, je treba poizvedbe spremeniti
+# cur=baza.cursor()
+# cur.execute(nekaj)
+# seznam=cur
+# in spet cur=baza.cursor()
 
 
 
@@ -285,7 +321,6 @@ if __name__ == "__main__":
 #baza = psycopg2.connect(conn_string)
 #baza = sqlite3.connect(baza_datoteka, isolation_level= None)
 #izpise kere sql stavke posilja. Izpise v terminal
-#baza.set_trace_callback(print)
 #cur = baza.cursor()
 #da uposteva foreign keye. Privzeto jih ne, ce tega eksplicitno ne poves
 #cur.execute("PRAGMA foreign_keys = ON;")

@@ -3,7 +3,7 @@ import sqlite3
 from auth_public import *
 
 #s tem smo dodali podatke v bazo php-admin. prijavil se z mojim imenom in geslom
-conn_string = "host= '{0}'  dbname='{1}' user='{2}' password='{3}'".format(host,dbname,user,password)
+conn_string = "host= '{0}'  dbname='{1}' user='{2}' password='{3}'".format(host,db,user,password)
 
 
 def uvoziSQL(cur, dat):
