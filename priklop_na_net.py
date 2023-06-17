@@ -7,7 +7,7 @@ conn_string = "host= '{0}'  dbname='{1}' user='{2}' password='{3}'".format(host,
 
 
 def uvoziSQL(cur, dat):
-    with open(dat) as f:
+    with open(dat, encoding="utf-8") as f:
         skript = f.read()
         cur.execute(skript)
 
@@ -16,8 +16,9 @@ with psycopg2.connect(conn_string) as con:
     cur = con.cursor()
     #uvozimo podatke iz datoteke
     uvoziSQL(cur, "podatki/nba.sql")
-    uvoziSQL(cur, 'podatki/stat.sql')
-    cur.execute("""insert into oseba (emso, geslo, username) values (123456789, 'gesloo','krompir');""")
+    uvoziSQL(cur, 'podatki/ekipe.sql')
+    uvoziSQL(cur, 'podatki/igralec.sql')
+    uvoziSQL(cur, 'podatki/injury.sql')
     con.commit()
 #ce nimamo stavka with, moramo na koncu dodati še con.commit()
 

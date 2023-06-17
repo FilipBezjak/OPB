@@ -1,7 +1,11 @@
 % setdefault(napaka, '')
 % setdefault(uporabnik, '')
 % rebase('html/osnova.html', napaka=napaka, naslov='Uporabnik', uporabnik=uporabnik)
-
+<style>
+    .fixed-table-container{
+        height: 30%;
+    }
+</style>
 
 
 <div class="gumbclass" style="width: 500px;">
@@ -13,8 +17,8 @@
         %end
     </div>
 </div>
-
-    <table style="width: 300px;" style="width: 200px;" class="table" data-toggle="table" style="padding: 1000px">
+<div style="margin-bottom: 10px;">
+    <table  style="width: 300px;" style="width: 200px;" class="table" data-toggle="table" style="padding: 1000px">
         <thead>
         <tr>
             <th>Ekipa</th>
@@ -36,5 +40,41 @@
         </tr>
         %end
     </table>
+</div>
+
+%for ekipa in top3TAS:
+%ime=ekipa[0]
+%tocke=ekipa[1]
+%asistence=ekipa[2]
+%skoki=ekipa[3]
+<div class="gumb">{{ime}}</div>
+    <table class="table" data-toggle="table">
+        <thead>
+      <tr>
+        <th>Najboljši trije</th>
+        <th>Točke</th>
+        <th></th>
+        <th>Asistence</th>
+        <th></th>
+        <th>Skoki</th>
+      </tr>
+        </thead>
+
+    %for i in range(3):
+      <tr>
+        <td>{{tocke[i][0]}}</td>
+        <td>{{tocke[i][1]}}</td>
+        <td>{{asistence[i][0]}}</td>
+        <td>{{asistence[i][1]}}</td>
+        <td>{{skoki[i][0]}}</td>
+        <td>{{skoki[i][1]}}</td>
+      </tr>
+    %end #i-jev
+</table>
+%end #top3TAS
+    
+
+
+
 </body>
 </html>

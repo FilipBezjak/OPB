@@ -1,16 +1,30 @@
-from glob import glob
-from bottle import * 
-import sqlite3
+import os
 import hashlib
 import tracemalloc
 import poizvedbe
 #poizvedbe v bazo delamo v drugi datoteki
 
-tracemalloc.start()
+
+# uvozimo bottle.py
+from bottleext import *
+
+# uvozimo ustrezne podatke za povezavo
+import auth_public as auth
+
+# uvozimo psycopg2
+import psycopg2, psycopg2.extensions, psycopg2.extras
+psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) 
+# se znebimo problemov s šumniki
+# privzete nastavitve
+SERVER_PORT = os.environ.get('BOTTLE_PORT', 8080)
+RELOADER = os.environ.get('BOTTLE_RELOADER', True)
+DB_PORT = os.environ.get('POSTGRES_PORT', 5432)
+
+
+#tracemalloc.start()
 #bazo smo naredili v priklop 
-baza_datoteka = "test.db"
+#baza_datoteka = "test.db"
 skrivnost = "wct3uifzgciuwrt427364gi237g4"
-debug(True)
 
 napakaSporocilo=None
 #vrne staro napako in jo nastavi na novo, ki jo vrne ob naslednjem klicu.
@@ -74,10 +88,10 @@ def igralci(sort):
     cur=baza.cursor()
     if ekipe=='t':
         igralci = poizvedbe.igralci(cur,True)
-        return template('html/igralci_ekipe.html',url=url,igralci=igralci, poskodbe=poskodbe,uporabnik=preveriUporabnika(), napaka="")
+        return template('html/igralci_ekipe.html',poekipah=True,url=url,igralci=igralci, poskodbe=poskodbe,uporabnik=preveriUporabnika(), napaka="")
     else:
         igralci = poizvedbe.igralci(cur,False)
-        return template('html/igralci.html',url=url,igralci=igralci, poskodbe=poskodbe, napaka=nastaviSporocilo(),uporabnik=preveriUporabnika())
+        return template('html/igralci.html',poekipah=False,url=url,igralci=igralci, poskodbe=poskodbe, napaka=nastaviSporocilo(),uporabnik=preveriUporabnika())
 
 
 @get('/poskodba')
@@ -88,14 +102,15 @@ def poskodba():
     return template('html/poskodba.html',poskodba=poskodba, napaka=nastaviSporocilo(), uporabnik=uporabnik)
 
 @get('/uporabnik')
-def uporabik():
-    print("hej18")
+def uporabnik():
     uporabnik=preveriUporabnika()
     cur=baza.cursor()
     ekipe= cur.execute(f"""SELECT ime,kratica from ekipa left join najljubse on najljubse.ekipa=ekipa.kratica where clovek!='{uporabnik}' or clovek is null""").fetchall()
     najljubse = cur.execute(f"""SELECT ekipa.ime, ekipa FROM najljubse JOIN oseba ON najljubse.clovek = oseba.username JOIN ekipa on ekipa.kratica=najljubse.ekipa WHERE username='{uporabnik}'""").fetchall()
+    top3TAS=poizvedbe.top3tas(cur,uporabnik)
+    # nam da top 3 pri pike asistence, skoki pri najljubsih, kot [[brooklyn nets,[[[igralec1, #pik],[igralec2, #pik],[igralec3, #pik]][igralec1, #ast],[...],]
     #na koncu nujno fetchall, sicer ga html ne zna prebrati
-    return template('html/uporabnik.html', najljubse=najljubse, napaka=nastaviSporocilo(), uporabnik=uporabnik, ekipe=ekipe, cur=cur)
+    return template('html/uporabnik.html',top3TAS=top3TAS, najljubse=najljubse, napaka=nastaviSporocilo(), uporabnik=uporabnik, ekipe=ekipe, cur=cur)
 
     
 @get('/uporabnik/<ekipa>/dodaj')
@@ -109,16 +124,41 @@ def dodaj_ekipo(ekipa):
     except:
         #nastavimo sporocilo
         nastaviSporocilo(f"{ekipa} ni ime ekipe")
-    redirect('/uporabnik')
+    redirect(url('/uporabnik'))
 
 
+@get('/adminstrator')
+def admin():
+    uporabnik=preveriUporabnika()
+    cur=baza.cursor()
+    priljubljenost = poizvedbe.pril(cur)
+    osebe=cur.execute("SELECT * from oseba").fetchall()
+    return template('html/adminstrator.html', uporabnik=uporabnik,osebe=osebe, priljubljenost=priljubljenost, napaka=None)
+
+@post('/adminstrator')
+def admin():
+    domaci = request.forms.domaci
+    gosti = request.forms.gosti
+    datum = request.forms.datum
+    cur=baza.cursor()
+    cur.execute(f"""INSERT into tekme (ekipa1, ekipa2, cas) values ('{domaci}', '{gosti}', '{datum}')""")
+    redirect(url('/adminstrator'))
+    
+    
+@post('/adminstrator/<uporabnik>')
+def admin(uporabnik):
+    cur=baza.cursor()
+    cur.execute(f"""DELETE from oseba where username='{uporabnik}'""")
+    redirect(url('/adminstrator'))
+    #dodaj se trigerje
+    
 #<ekipa> nam da vrednost ekipe pri brisi
 @post('/uporabnik/<ekipa>')
 def brisi(ekipa):
     uporabnik=preveriUporabnika()
     cur=baza.cursor()
     cur.execute(f"""delete from najljubse where clovek='{uporabnik}' and ekipa='{ekipa}'""")
-    redirect('/uporabnik')
+    redirect(url('/uporabnik'))
 
 ###registracija in prijava.
 
@@ -135,7 +175,7 @@ def prijava_post():
     print(password)
     if username is None or password is None:
         nastaviSporocilo("nekaj si pustli prazno")
-        redirect('/prijava')
+        redirect(url('/prijava'))
     c = baza.cursor()
     gesloHash = None
     #pazi, vejica za username in cursor vrne tuple, zato 
@@ -149,18 +189,18 @@ def prijava_post():
         gesloHash = None
     if gesloHash==None:
         nastaviSporocilo("Uporabnik ne obstaja")
-        redirect('/prijava')
+        redirect(url('/prijava'))
         #pogledamo, ali je geslo pravilno
     if hashGesla(password) != gesloHash:
         nastaviSporocilo("Napačno geslo")
-        redirect("/prijava")
+        redirect(url("/prijava"))
     response.set_cookie('username', username, secret=skrivnost)
-    redirect('/uporabnik')
+    redirect(url('/uporabnik'))
     
 @get('/odjava')
 def odjava_get():
     response.delete_cookie('username')
-    redirect('/prijava')
+    redirect(url('/prijava'))
 
 
 @get('/registracija')
@@ -181,10 +221,10 @@ def registracija_post():
     c = baza.cursor()
     if len(password)<4:
         nastaviSporocilo("Geslo mora vsebovati vsaj 4 znake")
-        redirect('/registracija')
+        redirect(url('/registracija'))
     if password != password2:
         nastaviSporocilo("Gesli se ne ujemata")
-        redirect('/registracija')
+        redirect(url('/registracija'))
     #zakodira geslo in ga vstavi v bazo
     zg = hashGesla(password)
     #dodamo osebo v bazo
@@ -199,8 +239,8 @@ def registracija_post():
     except:
         # če je uporabniško ime zasedeno
         napaka = nastaviSporocilo("Uporabniško ime že obstaja")
-        redirect('/registracija')
-    redirect('/uporabnik')
+        redirect(url('/registracija'))
+    redirect(url('/uporabnik'))
 
 
 #geslo zakodira
@@ -212,8 +252,6 @@ def hashGesla(geslo):
 def preveriUporabnika():
     #dobi username tistega, ki trenutno uporablja stran
     username = request.get_cookie("username", secret=skrivnost)
-    print("username je:")
-    print(username)
     if username:
         c = baza.cursor()
         uporabnik = None
@@ -229,12 +267,27 @@ def preveriUporabnika():
 
 
 
+
+######################################################################
+# Glavni program
+
+# priklopimo se na bazo
+baza = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, password=auth.password, port=DB_PORT)
+#conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT) # onemogočimo transakcije
+cur = baza.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+# poženemo strežnik na podanih vratih, npr. http://localhost:8080/
+if __name__ == "__main__":
+    run(host='localhost', port=SERVER_PORT, reloader=RELOADER)
+
+#conn_string = "host= '{0}'  dbname='{1}' user='{2}' password='{3}'".format(host,dbname,user,password)
 #se povezemo z bazo s tem 
-baza = sqlite3.connect(baza_datoteka, isolation_level= None)
+#baza = psycopg2.connect(conn_string)
+#baza = sqlite3.connect(baza_datoteka, isolation_level= None)
 #izpise kere sql stavke posilja. Izpise v terminal
 #baza.set_trace_callback(print)
-cur = baza.cursor()
+#cur = baza.cursor()
 #da uposteva foreign keye. Privzeto jih ne, ce tega eksplicitno ne poves
-cur.execute("PRAGMA foreign_keys = ON;")
+#cur.execute("PRAGMA foreign_keys = ON;")
 #vzpostavi streznik
-run(host='localhost', port = 8080, reloader=True, debug=True)
+#run(host='localhost', port = 8080, reloader=True, debug=True)

@@ -1,5 +1,12 @@
 % rebase('html/osnova.html', napaka=napaka, uporabnik=uporabnik, naslov='Statistika')
+% ekipe, poskodbetf =url[-2], url[-1]
 
+
+<style>
+    .fixed-table-container{
+        height: 220%;
+    }
+</style>
 
 
 <script>function redirect_ekipe() {
@@ -31,10 +38,19 @@ function redirect_poskodbe(){
  </script>
 
 
-<div class="gumbclass"  style="margin-bottom: 20px;">
-<a onclick="redirect_poskodbe()" class="gumb" >Pokaži poškodovane</a>
-<a onclick="redirect_ekipe()" class="gumb">Razvrsti po ekipah</a>
-</div>
+ <div class="gumbclass"  style="margin-bottom: 20px;">
+    %if poskodbetf=="t":
+    <a style='color: rgb(117, 223, 117);' onclick="redirect_poskodbe()" class="gumb" >Pokaži poškodovane</a>
+    %else:
+    <a style='color: rgb(205, 92, 92);' onclick="redirect_poskodbe()" class="gumb" >Pokaži poškodovane</a>
+    %end
+    %if ekipe=="t":
+    <a style='color: rgb(117, 223, 117);' onclick="redirect_ekipe()" class="gumb">Razvrsti po ekipah</a>
+    %else:
+    <a style='color: rgb(205, 92, 92);' onclick="redirect_ekipe()" class="gumb">Razvrsti po ekipah</a>
+    %end
+    </div>
+
 
         % for ekipa,igralci_e in igralci:
         <div class="gumb">{{ekipa}}</div>

@@ -21,7 +21,7 @@ insert into ekipa (ime, kratica) values ('New York Knicks', 'NYK');
 insert into ekipa (ime, kratica) values ('Oklahoma City Thunder', 'OKC');
 insert into ekipa (ime, kratica) values ('Orlando Magic', 'ORL');
 insert into ekipa (ime, kratica) values ('Philadelphia 76ers', 'PHI');
-insert into ekipa (ime, kratica) values ('Phoenix Suns', 'PHX');
+insert into ekipa (ime, kratica) values ('Phoenix Suns', 'PHO');
 insert into ekipa (ime, kratica) values ('Portland Trail Blazers', 'POR');
 insert into ekipa (ime, kratica) values ('Sacramento Kings', 'SAC');
 insert into ekipa (ime, kratica) values ('San Antonio Spurs', 'SAS');

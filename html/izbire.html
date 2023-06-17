@@ -21,11 +21,11 @@
 {{poskodovan}} ni zanimiv.
 %else:
 <table id="izpis" style="width: 600px" class="table" data-toggle="table">
-%for izbire, stat in zip(igralci_izbire,["Točke","Asistence","Skoki"]):
+%for izbire, stat in zip(igralci_izbire,["točk","asistenc","skokov"]):
 %if izbire:
 <tr style="border-top-style: hidden;">
-    <td style="border-left-style: hidden; border-right-style: hidden;"></td>
-    <td style="border-right-style: hidden;">Pri {{stat}} zanimivi:</td>
+    <td style="border-left-style: hidden; border-right-style: hidden;">Igralci, ki bodo dosegli več {{stat}}, če bo manjkal:</td>
+    <td style="border-right-style: hidden;"></td>
     <td style="border-right-style: hidden;"></td>
     <td style="border-right-style: hidden;"></td>
     <td style="border-right-style: hidden;"></td>

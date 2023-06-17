@@ -26,7 +26,7 @@ ekipe={
 'OKC': 'Oklahoma City Thunder',
 'ORL': 'Orlando Magic',
 'PHI': 'Philadelphia 76ers',
-'PHX': 'Phoenix Suns',
+'PHO': 'Phoenix Suns',
 'POR': 'Portland Trail Blazers',
 'SAC': 'Sacramento Kings',
 'SAS': 'San Antonio Spurs',
@@ -47,6 +47,7 @@ def igralec(s):
     s=eval(s)
     q=s[0]
     ime=q.get(("ime"))
+    ime=ime.replace("'", "''")
     minute=float(q.get(("minute")))
     pozicija=q.get(("pozicija"))
     rebounds=float(q.get(("rebounds")))
@@ -56,7 +57,9 @@ def igralec(s):
     #damo replace, zaradi prestopov, ce je 2x isto ime, pomeni, da je igralec prestopil, zato vzamemo
     # njegove zadnje vrednosti, saj je to statistika pri ekipi, v kateri trenutno igra. Id ne rabimo, primary key
     # bo kar ime
-    s=f"""replace into igralec (ime, ekipa, pozicija, tocke, asistence, skoki, odigrane_minute) values ("{ime}", '{ekipa}', '{pozicija}', {tocke}, {asistence}, {rebounds}, {minute});""" + "\n"
+    s=f"""insert into igralec (ime, ekipa, pozicija, tocke, asistence, skoki, odigrane_minute) values ('{ime}', '{ekipa}', '{pozicija}', {tocke}, {asistence}, {rebounds}, {minute})
+    ON CONFLICT (ime) DO UPDATE 
+    set ekipa=excluded.ekipa, tocke=excluded.tocke, asistence=excluded.asistence, skoki=excluded.skoki, odigrane_minute=excluded.odigrane_minute;""" + "\n"
     return s
 
 def injury(s):
@@ -85,7 +88,7 @@ with open("podatki/injury.sql","w",encoding='utf-8') as fsql, open("podatki/inju
     for ime in slov:
         #vsako poškodbo pogleda, kaj je in vrne pravilen datum okrevanja v sql obliki
         cas=injury(slov[ime])
-        s+=f"""insert into poskodba (ime, cas) values ("{ime}", '{cas}');""" + "\n"
+        s+=f"""insert into poskodba (ime, cas) values ('{ime}', '{cas}');""" + "\n"
     fsql.write(s)
 
 
