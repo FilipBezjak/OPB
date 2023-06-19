@@ -67,7 +67,7 @@ def injury(s):
     leto=now.year
     if s== 'GTD':
         s=now.strftime('%Y-%m-%d')
-    elif s[-1]=='n':
+    elif s=="Probable for start of season":
         l=leto+1
         s=f'{l}-09-01'
     else:
@@ -80,32 +80,37 @@ def injury(s):
     return s
 
 
+
+
 #del za POŠKODBE
-with open("podatki/injury.sql","w",encoding='utf-8') as fsql, open("podatki/injury.json","r",encoding='utf-8') as fjson:
-    celo=fjson.read()
-    slov=eval(celo)
-    s=''
-    for ime in slov:
-        #vsako poškodbo pogleda, kaj je in vrne pravilen datum okrevanja v sql obliki
-        cas=injury(slov[ime])
-        s+=f"""insert into poskodba (ime, cas) values ('{ime}', '{cas}');""" + "\n"
-    fsql.write(s)
+def poskodbe2():
+    with open("podatki/injury.sql","w",encoding='utf-8') as fsql, open("podatki/injury.json","r",encoding='utf-8') as fjson:
+        celo=fjson.read()
+        slov=eval(celo)
+        s=''
+        for ime in slov:
+            #vsako poškodbo pogleda, kaj je in vrne pravilen datum okrevanja v sql obliki
+            cas=injury(slov[ime])
+            s+=f"""insert into poskodba (ime, cas) values ('{ime}', '{cas}');""" + "\n"
+        fsql.write(s)
 
 
 #del za EKIPE
 #dodamo vse v tabelo ekipe, iz slovarja, ki ga mamo spodaj
-with open("podatki/ekipe.sql","w",encoding='utf-8') as ap:
-    #vzamemo global slovar
-    st=''
-    for k, v in ekipe.items():
-        s=f"insert into ekipa (ime, kratica) values ('{v}', '{k}');" + "\n"
-        st+=s
-    ap.write(st)
+def ekipe2():
+    with open("podatki/ekipe.sql","w",encoding='utf-8') as ap:
+        #vzamemo global slovar
+        st=''
+        for k, v in ekipe.items():
+            s=f"insert into ekipa (ime, kratica) values ('{v}', '{k}');" + "\n"
+            st+=s
+        ap.write(st)
 
 
 
 #nam da tabelo IGRALEC
 #obrni slashe, ko kopiras relative path
-with open("podatki/test.html",'r',encoding='utf-8') as f,open("podatki/igralec.sql","w",encoding='utf-8') as ap:
-    for vr in f:
-        ap.write(igralec(vr))
+def igralec2():
+    with open("podatki/test.html",'r',encoding='utf-8') as f,open("podatki/igralec.sql","w",encoding='utf-8') as ap:
+        for vr in f:
+            ap.write(igralec(vr))

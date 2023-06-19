@@ -1,6 +1,13 @@
 % setdefault(napaka, '')
 % rebase('html/osnova.html', napaka=napaka, naslov='Poškodba')
 
+%if admin:
+<div class="'gumb">
+<a href="{{url('administrator_refresh')}}">Osveži</a>
+</div>
+%end
+
+
 <table id="poskodbe" class="table" data-toggle="table" style="width: 700px">
     <thead>
         <th data-sortable="true" >Ime</th>

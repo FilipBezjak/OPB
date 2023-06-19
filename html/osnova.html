@@ -64,9 +64,7 @@
             </li>
             %if admin:
             <li class="nav-item">
-              <form action="{{url('administrator_get')}}" method="GET">
-                <a href="#" onclick="this.parentElement.submit()">Administrator</a>
-              </form>    
+              <a class="nav-link" href="{{url('administrator_get)')}}">Administrator</a>
             </li>
             %end
             

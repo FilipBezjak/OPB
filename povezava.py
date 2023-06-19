@@ -47,12 +47,13 @@ static_dir = "./static"
 def static(filename):
     return static_file(filename, root=static_dir)
 
+
+#funkcija, ki sprejme dekorator in vrne dekorator
 def aliNekaj(funpreveri):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
             if funpreveri():
-                print(funpreveri())
                 return func(*args, **kwargs)
             else:
                 abort(401, "Dostop prepovedan!")
@@ -82,15 +83,18 @@ def je_prijavljen():
         return False
 
 
-
+########## prva stran ################
 @get('/')
 def zacetna_get():
-    cur=baza.cursor()
-    cur.execute(f"""SELECT *  FROM tekme order by cas desc limit 10""")
-    tekme=cur
+    geslo = hashGesla("1234")
+    poizvedbe.dodaj_admina(baza,geslo)
+    tekme=poizvedbe.tekme(baza)
     baza.commit()
     return template('html/zacetna.html', napaka=nastaviSporocilo(),uporabnik=preveriUporabnika(),admin=je_admin(), tekme=tekme)
 
+
+
+####### stran izbire #############3
 @get('/izbire')
 def izbire_get():
     cur=baza.cursor()
@@ -122,7 +126,7 @@ def izbire_igralec(poskodovan):
     #potem še vrnemo vse ki igrajo na isti poziciji.
     return template('html/izbire.html', poskodovan=poskodovan ,igralci=igralci,igralci_izbire=igralci_izbire, napaka = "", uporabnik=preveriUporabnika(),admin=je_admin(), odprej=odprej)
 
-
+################# stran statistika ################33
 @get('/igralci/<sort>')
 def igralci(sort):
     #na konec urlja dobimo tf, ki nam pove, če pokažemo poškodovane oziroma razvrstimo po ekipah
@@ -140,6 +144,8 @@ def igralci(sort):
         baza.commit()
         return template('html/igralci.html',poekipah=False,igralci=igralci, poskodbe=poskodbe, napaka=nastaviSporocilo(),uporabnik=preveriUporabnika(),admin=je_admin())
 
+
+################### stran poskodbe ################3333
 
 @get('/poskodba')
 def poskodba_get():
@@ -204,7 +210,6 @@ def uporabnik_ekipa(ekipa):
 @aliNekaj(je_admin)
 def administrator_get():
     uporabnik=preveriUporabnika()
-    print(uporabnik)
     priljubljenost = poizvedbe.pril(baza)
     cur=baza.cursor()
     cur.execute("SELECT * from oseba")
@@ -214,19 +219,16 @@ def administrator_get():
     ekipe=cur.fetchall()
     baza.commit()
     datum=datum=datetime.now().strftime("%Y-%m-%d")
-    print(datum)
     return template('html/administrator.html', uporabnik=uporabnik,admin=je_admin(),osebe=osebe, ekipe=ekipe, priljubljenost=priljubljenost, napaka=nastaviSporocilo(), datum=datum)
 
+
+#stran administrator
 @post('/administrator')
 @aliNekaj(je_admin)
 def administrator_post():
     domaci = request.forms.domaci
     gosti = request.forms.gosti
     datum = request.forms.datum
-    print(domaci)
-    print(gosti)
-    print(gosti)
-    print(datum)
     cur=baza.cursor()
     cur.execute(f"""INSERT into tekme (ekipa1, ekipa2, cas) values ('{domaci}', '{gosti}', '{datum}')""")
     nastaviSporocilo("Uspešno dodana tekma")
@@ -234,6 +236,14 @@ def administrator_post():
     redirect(url('administrator_get'))
 
 
+#osveži stran za poškodbe
+@post('/administrator/refresh')
+@aliNekaj(je_admin)
+def administrator_refresh():
+    poizvedbe.poskodbe(baza)
+    redirect(url('poskodba'))
+    
+#izbriše uporabnika, ki je vpisan
 @get('/administrator/<uporabnik>')
 @aliNekaj(je_admin)
 def administrator_uporabnik(uporabnik):
@@ -271,12 +281,11 @@ def prijava_post():
     except:
         gesloHash = None
     if gesloHash==None:
-        print("tle")
         nastaviSporocilo("Uporabnik ne obstaja")
         baza.commit()
         redirect(url('/prijava'))
         #pogledamo, ali je geslo pravilno
-    if hashGesla(password) != gesloHash:
+    if not preveri_geslo(password, gesloHash):
         nastaviSporocilo("Napačno geslo")
         baza.commit()
         redirect(url("/prijava"))
@@ -329,24 +338,20 @@ def registracija_post():
     redirect(url('uporabnik_get'))
 
 
-#geslo zakodira
+##########################  geslo zakodira
 
 def hashGesla(geslo):
     geslo = geslo.encode("utf-8")
     sol = bcrypt.gensalt()
-    return bcrypt.hashpw(geslo, sol)
+    return bcrypt.hashpw(geslo, sol).decode("utf-8")
 
 
 def preveri_geslo(geslo, zgostitev):
     geslo = geslo.encode("utf-8")
+    zgostitev=zgostitev.encode("utf-8")
     return bcrypt.checkpw(geslo, zgostitev)
 
 
-
-#def hashGesla(geslo):
-    #m=hashlib.sha256()
-    #m.update(geslo.encode("utf-8"))
-    #return m.hexdigest()
 
 #######################3
 def preveriUporabnika():
