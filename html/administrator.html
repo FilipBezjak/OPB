@@ -1,0 +1,127 @@
+% setdefault(napaka, '')
+% setdefault(uporabnik, '')
+% rebase('html/osnova.html', napaka=napaka, naslov='Administrator', uporabnik=uporabnik)
+<style>
+    .form-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .small-font {
+        font-size: 12px; /* Adjust the font size as needed */
+    }
+
+    .small-radio {
+        transform: scale(1.2);
+        margin-right: 2px;}
+</style>
+
+<div class="gumb">
+    Uporabniki
+</div>
+
+<table class="table" style="width: 400px">
+<thead>
+    <th>Ime</th>
+    <th>Priimek</th>
+    <th>Uporabniško ime</th>
+    <th>Admin</th>
+    <th></th>
+</thead>
+<tbody>
+    %for ime, priimek, username,_,admin in osebe:
+    <tr>
+        <td>{{ime}}</td>
+        <td>{{priimek}}</td>
+        <td>{{username}}</td>
+        <td>{{admin}}</td>
+        <td style="padding: 0px;" style="background-color: grey">
+            <form action="{{url('administrator_uporabnik', uporabnik=username)}}" method="get" class="gumbclass">
+                <input class="gumb" value="Briši" type="submit"/>
+            </form>
+        </td>
+    </tr>
+    %end #osebe
+</tbody>
+</table>
+
+
+<div class="gumb">
+Priljubljene ekipe</div>
+<table class="table" style="width: 300px">
+    <thead>
+        <th>Ekipa</th>
+        <th>Število uporabnikov</th>
+    </thead>
+    <tbody>
+        %for ekipa, stevilo in priljubljenost:
+        <tr>
+            <td>{{ekipa}}</td>
+            <td>{{stevilo}}</td>
+        </tr>
+    </tbody>
+    %end #priljubljenost
+</table>
+
+
+<style>
+    th, td {
+        padding: 10px 10px 10px 10px;}
+
+        .gumb:hover, .gumb:focus {
+            background-color: grey;
+            cursor: default;
+        }        
+        .gumbclass:hover, .gumbclass:focus {
+            background-color: grey;
+            cursor: default;
+        }
+
+
+</style>
+<div class="gumb">
+Dodaj Tekmo
+</div>
+
+<form action = "{{url('administrator_post')}}" method = "post">
+    <table>
+    <thead>
+        <th>Domači</th>
+        <th>Gosti</th>
+    </thead>
+        <tbody>
+            %for ekipa,kratica in ekipe:
+            <tr>
+                <td>
+        <div>
+            <input class="small-radio" name="domaci" type="radio" id="radio" value="{{kratica}}"/>
+            <label class="small-font" for = "domaci">{{ekipa}}</label>
+        </td>
+        <td>
+            <div>
+                <input class="small-radio" name="gosti" type="radio" id="radio" value="{{kratica}}"/>
+                <label class="small-font" for = "gosti">{{ekipa}}</label>
+            </td>
+        </tr>
+        %end
+    </tbody>
+</table>
+<div style="width: 500px">
+    <div class="form-row"style="width: 200px">
+        <div class = "form-group col-md-6">
+            <label for ="datum">Datum:</label>
+            <input for ="datum" name="datum" type="date"  class="form-control"
+            value={{datum}} min={{datum}} max="2024-06-30"/>
+        </div>
+    </div>
+        <div class="gumbclass">
+            <button class="gumb" type = "submit">
+                Dodaj tekmo
+            </button>
+        </div>
+    </div>
+</form>
+
+  
+
+            

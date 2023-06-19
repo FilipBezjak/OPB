@@ -7,7 +7,7 @@
     <div id="izbireGumb" class="igralci">
         <input type="text" placeholder="Išči.." id="vnos" onkeyup="isci2()">
         %for igralec in igralci:
-      <a href="/izbire/{{igralec[0]}}">{{igralec[0]}}</a>
+      <a href="{{url('izbire_igralec', poskodovan=igralec[0])}}">{{igralec[0]}}</a>
       %end
     </div>
 </div>

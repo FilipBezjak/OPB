@@ -1,0 +1,5 @@
+jupyter-server-proxy
+psycopg2
+hashlib
+datetime
+functools

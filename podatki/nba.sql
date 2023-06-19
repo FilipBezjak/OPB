@@ -12,7 +12,7 @@ CREATE TABLE oseba (
     priimek TEXT NOT NULL,
     username TEXT PRIMARY KEY,
     geslo TEXT NOT NULL,
-    adminstrator BOOLEAN NOT NULL DEFAULT (FALSE)
+    administrator BOOLEAN NOT NULL DEFAULT (FALSE)
 );
 
 CREATE TABLE ekipa (
@@ -44,7 +44,7 @@ CREATE TABLE poskodba (
 CREATE TABLE tekme (
     ekipa1 VARCHAR REFERENCES  ekipa(kratica),
     ekipa2 VARCHAR REFERENCES  ekipa(kratica),
-    cas TIME NOT NULL
+    cas date NOT NULL
 )
 
 

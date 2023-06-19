@@ -62,6 +62,13 @@
             <li class="nav-item">
               <a class="nav-link" href="{{url('registracija_get')}}">Registracija</a>
             </li>
+            %if admin:
+            <li class="nav-item">
+              <form action="{{url('administrator_get')}}" method="GET">
+                <a href="#" onclick="this.parentElement.submit()">Administrator</a>
+              </form>    
+            </li>
+            %end
             
           </ul>
         </div>
