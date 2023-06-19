@@ -2,5 +2,4 @@ psycopg2
 pandas
 bottle
 dataclasses-json
-hashlib
 jupyter-server-proxy

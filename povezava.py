@@ -331,9 +331,9 @@ def registracija_post():
 
 #geslo zakodira
 def hashGesla(geslo):
-    m=hashlib.sha256()
-    m.update(geslo.encode("utf-8"))
-    return m.hexdigest()
+    #m=hashlib.sha256()
+    #m.update(geslo.encode("utf-8"))
+    #return m.hexdigest()
 
 #######################3
 def preveriUporabnika():
