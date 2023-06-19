@@ -3,3 +3,4 @@ pandas
 bottle
 dataclasses-json
 jupyter-server-proxy
+bcrypt

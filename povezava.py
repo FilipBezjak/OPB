@@ -1,5 +1,5 @@
 import os
-import hashlib
+import bcrypt
 from textwrap import wrap
 import tracemalloc
 import poizvedbe
@@ -330,7 +330,20 @@ def registracija_post():
 
 
 #geslo zakodira
+
 def hashGesla(geslo):
+    geslo = geslo.encode("utf-8")
+    sol = bcrypt.gensalt()
+    return bcrypt.hashpw(geslo, sol)
+
+
+def preveri_geslo(geslo, zgostitev):
+    geslo = geslo.encode("utf-8")
+    return bcrypt.checkpw(geslo, zgostitev)
+
+
+
+#def hashGesla(geslo):
     #m=hashlib.sha256()
     #m.update(geslo.encode("utf-8"))
     #return m.hexdigest()
