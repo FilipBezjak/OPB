@@ -1,6 +1,57 @@
 
 % rebase('html/osnova.html', napaka=napaka, uporabnik=uporabnik, naslov='Izbire')
 
+<style>
+  
+
+  .gumb {
+    background-color: grey;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none
+    }
+    
+    /* gumbclass ko mamo miško gor */
+    .gumb:hover, .gumb:focus {
+    background-color: rgb(164, 159, 159);
+    }
+    
+    /* da field isci zgleda boljse */
+    #vnos {
+    font-size: 16px;
+    padding: 14px 20px 12px 45px;
+    }
+    
+    
+    /*da se igralci prikažejo pod gumbom in ne desno*/
+    .gumbclass {
+      display: inline-block;
+      }
+    
+    /* da na začetku skrije igralce */
+    .igralci {
+    display: none;
+    background-color: #f6f6f6;
+    }
+    
+    /* ko se spusti tisto, block nam da, da pokažemo enega po enega */
+    .igralci a {
+      color: black;
+    padding: 12px 16px;
+    display: block;
+    }
+    
+    
+    .show {display:block;}
+    
+    .table{
+        width: 300px;
+        height: 100px;
+    }
+</style>
+
+
 <script>
 
     'use strict'
