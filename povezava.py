@@ -207,8 +207,8 @@ def uporabnik_ekipa(ekipa):
 ################# ADMINSTRATOR PAGE########33
 ##dostop samo administratorju
 
-@get('/administrator')
 @aliNekaj(je_admin)
+@get('/administrator')
 def administrator_get():
     uporabnik=preveriUporabnika()
     priljubljenost = poizvedbe.pril(baza)
