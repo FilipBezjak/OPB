@@ -67,6 +67,7 @@ def aliNekaj(funpreveri):
 def je_admin():
     username = request.get_cookie("username", secret=skrivnost)
     c = baza.cursor()
+    print(f"""SELECT administrator from oseba where username='{username}'""")
     c.execute(f"""SELECT administrator from oseba where username='{username}'""")
     try:
         admin=c.fetchone()[0]
@@ -117,7 +118,7 @@ def izbire_igralec(poskodovan):
     igralci=cur
     cur=baza.cursor()
     cur.execute(f"""SELECT ekipa from igralec where ime = '{poskodovan}'""")
-    ekipa=cur
+    ekipa=cur.fetchall()[0][0]
     igralciT=poizvedbe.izbire(ekipa, baza,poskodovan, 'tocke')
     igralciA=poizvedbe.izbire(ekipa, baza,poskodovan, 'asistence')
     igralciS=poizvedbe.izbire(ekipa, baza,poskodovan, 'skoki')
@@ -212,7 +213,7 @@ def administrator_get():
     uporabnik=preveriUporabnika()
     priljubljenost = poizvedbe.pril(baza)
     cur=baza.cursor()
-    cur.execute("SELECT * from oseba")
+    cur.execute("""SELECT * from oseba where username!='filip';""")
     osebe=cur.fetchall()
     cur=baza.cursor()
     cur.execute(f"SELECT * from ekipa")
@@ -237,11 +238,11 @@ def administrator_post():
 
 
 #osveži stran za poškodbe
-@post('/administrator/refresh')
+@get('/administrator/refresh')
 @aliNekaj(je_admin)
 def administrator_refresh():
     poizvedbe.poskodbe(baza)
-    redirect(url('poskodba'))
+    redirect(url('poskodba_get'))
     
 #izbriše uporabnika, ki je vpisan
 @get('/administrator/<uporabnik>')
@@ -268,7 +269,7 @@ def prijava_post():
     password = request.forms.password
     if username is None or password is None:
         nastaviSporocilo("nekaj si pustli prazno")
-        redirect(url('/prijava'))
+        redirect(url('prijava_get'))
     gesloHash = None
     #pazi, vejica za username in cursor vrne tuple, zato 
     # je treba izbrati prvega
@@ -288,15 +289,15 @@ def prijava_post():
     if not preveri_geslo(password, gesloHash):
         nastaviSporocilo("Napačno geslo")
         baza.commit()
-        redirect(url("/prijava"))
+        redirect(url('prijava_get'))
     response.set_cookie('username', username, secret=skrivnost)
     redirect(url('uporabnik_get'))
-  #  
+
+
 @get('/odjava')
-@aliNekaj(je_prijavljen)
 def odjava_get():
     response.delete_cookie('username')
-    redirect(url('/prijava'))
+    redirect(url('prijava_get'))
 
 
 @get('/registracija')
@@ -316,17 +317,17 @@ def registracija_post():
     username = request.forms.username
     if len(password)<4:
         nastaviSporocilo("Geslo mora vsebovati vsaj 4 znake")
-        redirect(url('/registracija'))
+        redirect(url('registracija_get'))
     if password != password2:
         nastaviSporocilo("Gesli se ne ujemata")
-        redirect(url('/registracija'))
+        redirect(url('registracija_get'))
     #zakodira geslo in ga vstavi v bazo
     zg = hashGesla(password)
     #dodamo osebo v bazo
     try:
-        c = baza.cursor()
-        c.execute("""insert into oseba (username, geslo, ime, priimek) values (%s, %s,%s,%s)""",(username,zg,ime,priimek))
-        baza.commit()
+        with baza:
+            c = baza.cursor()
+            c.execute("""insert into oseba (username, geslo, ime, priimek) values (%s, %s,%s,%s)""",(username,zg,ime,priimek))
     #if uporabnik is None:
         napaka = nastaviSporocilo("Uspešno")
     #ko se nekdo registrira mu damo cookie
@@ -334,7 +335,7 @@ def registracija_post():
     except:
         # če je uporabniško ime zasedeno
         napaka = nastaviSporocilo("Uporabniško ime že obstaja")
-        redirect(url('/registracija'))
+        redirect(url('registracija_get'))
     redirect(url('uporabnik_get'))
 
 
@@ -387,6 +388,8 @@ def preveriUporabnika():
 
 
 
+#poizvedbe.izbire('MIL', baza, 'Jrue Holiday','tocke')
+
 
 ######################################################################
 # Glavni program
@@ -398,6 +401,7 @@ cur = baza.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 # poženemo strežnik na podanih vratih, npr. http://localhost:8080/
 if __name__ == "__main__":
+    #poizvedbe.izbire('MIL', baza, 'Jrue Holiday','tocke')
     run(host='localhost', port=SERVER_PORT, reloader=RELOADER)
 
 #conn_string = "host= '{0}'  dbname='{1}' user='{2}' password='{3}'".format(host,dbname,user,password)

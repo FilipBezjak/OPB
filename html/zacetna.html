@@ -1,6 +1,7 @@
 % setdefault(napaka, '')
 % setdefault(uporabnik, '')
 % rebase('html/osnova.html', napaka=napaka, naslov='Začetna stran', uporabnik=uporabnik)
+%import datetime
 <div class="gumb">
 Prihajajoče tekme
 </div>
@@ -14,9 +15,10 @@ Prihajajoče tekme
     </thead>
     </tr>
     %for domaci, gosti, cas in tekme:
+    %cas=datetime.datetime.strptime(str(cas),"%Y-%m-%d")
     <tr>
         <td>{{domaci}}</td>
         <td>{{gosti}}</td>
-        <td>{{cas}}</td>
+        <td>{{str(cas.day)+"."+str(cas.month)+"."+str(cas.year)}}</td>
     </tr>
     %end

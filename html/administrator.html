@@ -25,16 +25,14 @@
     <th>Ime</th>
     <th>Priimek</th>
     <th>Uporabniško ime</th>
-    <th>Admin</th>
     <th></th>
 </thead>
 <tbody>
-    %for ime, priimek, username,_,admin in osebe:
+    %for ime, priimek, username,_,_ in osebe:
     <tr>
         <td>{{ime}}</td>
         <td>{{priimek}}</td>
         <td>{{username}}</td>
-        <td>{{admin}}</td>
         <td style="padding: 0px;" style="background-color: grey">
             <form action="{{url('administrator_uporabnik', uporabnik=username)}}" method="get" class="gumbclass">
                 <input class="gumb" value="Briši" type="submit"/>
@@ -107,7 +105,7 @@ Dodaj Tekmo
     </tbody>
 </table>
 <div style="width: 500px">
-    <div class="form-row"style="width: 200px">
+    <div class="form-row"style="width: 400px">
         <div class = "form-group col-md-6">
             <label for ="datum">Datum:</label>
             <input for ="datum" name="datum" type="date"  class="form-control"

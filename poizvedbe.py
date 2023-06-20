@@ -60,18 +60,19 @@ def izbire(ekipa,baza,ime,tas):
     cur=baza.cursor()
     cur.execute("DROP view if exists prvi_3")
     #mora biti igralec.*, sicer vrne napako, ker bi imela dva stolpca ime "ime"
-    cur.execute(f"""CREATE view prvi_3 as select igralec.* from igralec left join poskodba on poskodba.ime=igralec.ime
-                            where ekipa='{ekipa}'and poskodba.ime IS NULL
-                                order by {tas} desc limit 3""")
-    cur.execute(f"""SELECT * from prvi_3
-                            where
-                                EXISTS( select 1 from prvi_3 where ime='{ime}') 
-                                and not 
-                                ime='{ime}'""")
-    igralci=cur
+    cur.execute(f"""
+        CREATE view prvi_3 as select igralec.* from igralec left join poskodba on poskodba.ime=igralec.ime
+            where ekipa='{ekipa}' and poskodba.ime IS NULL
+                order by {tas} desc limit 3""")
+    baza.commit()
     cur=baza.cursor()
+    sql=f""" SELECT * from prvi_3 where EXISTS( select 1 from prvi_3 where ime='{ime}') and not ime='{ime}'"""
+    cur.execute(sql)
+    igralci=cur.fetchall()
     cur.execute("DROP view prvi_3")
     return igralci
+
+
 
 def dodaj_admina(baza, geslo):
     cur=baza.cursor()
@@ -143,10 +144,11 @@ def poskodbe(baza):
             slovar[zadetek.groupdict()['ime']]=zadetek.groupdict()['stanje']
         slovar = slovar_poskodb(slovar)
         cur=baza.cursor()
-        cur.execute("DROP TABLE IF EXISTS poskodbe")
+        cur.execute("""TRUNCATE TABLE poskodba""")
         for ime in slovar:
             #vsako poškodbo pogleda, kaj je in vrne pravilen datum okrevanja v sql obliki
             cas=statistika.injury(slovar[ime])
+            ime=ime.replace("'", "''")
             cur.execute(f"""insert into poskodba (ime, cas) values ('{ime}', '{cas}');""")
         baza.commit()
             

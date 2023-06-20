@@ -1,6 +1,6 @@
 % setdefault(napaka, '')
-% rebase('html/osnova.html', napaka=napaka, naslov='Poškodba')
-
+% rebase('html/osnova.html', napaka=napaka, naslov='Poškodbe')
+%import datetime
 %if admin:
 <div class="'gumb">
 <a href="{{url('administrator_refresh')}}">Osveži</a>
@@ -16,10 +16,11 @@
     </tr>
 </thead>
 %for ime, ekipa, cas in poskodba:
+%cas=datetime.datetime.strptime(str(cas),"%Y-%m-%d")
 <tr>
     <td>{{ime}}</td>
     <td>{{ekipa}}</td>
-    <td>{{cas}}</td>
+    <td>{{str(cas.day)+"."+str(cas.month)+"."+str(cas.year)}}</td>
 </tr>
 %end
 </tbody>
