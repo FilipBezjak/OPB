@@ -19,8 +19,9 @@ with psycopg2.connect(conn_string) as con:
     #uvoziSQL(cur, 'podatki/ekipe.sql')
     #uvoziSQL(cur, 'podatki/igralec.sql')
     #uvoziSQL(cur, 'podatki/injury.sql')
-    uvoziSQL(cur, 'podatki/proba.sql')
-    #cur.execute("insert into oseba (username, geslo, ime, priimek, administrator) values ('filip', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4','Filip','Bezjak', TRUE)")
+    #uvoziSQL(cur, 'podatki/proba.sql')
+    print("hej")
+    uvoziSQL(cur, 'podatki/pravice.sql')
     con.commit()
 #ce nimamo stavka with, moramo na koncu dodati še con.commit()
 
