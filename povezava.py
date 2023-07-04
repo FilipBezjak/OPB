@@ -67,8 +67,7 @@ def aliNekaj(funpreveri):
 def je_admin():
     username = request.get_cookie("username", secret=skrivnost)
     c = baza.cursor()
-    print(f"""SELECT administrator from oseba where username='{username}'""")
-    c.execute(f"""SELECT administrator from oseba where username='{username}'""")
+    c.execute("""SELECT administrator from oseba where username=%s""" ,(username,))
     try:
         admin=c.fetchone()[0]
     except:
@@ -109,7 +108,7 @@ def izbire_igralec(poskodovan):
     cur=baza.cursor()
     #pogledamo, če je poškodovan že od prej,
     odprej=False
-    cur.execute(f"""SELECT * from poskodba where ime='{poskodovan}'""")
+    cur.execute("""SELECT * from poskodba where ime=%s""", (poskodovan,))
     if cur.fetchall():
         odprej=True
     #poiščemo pri kateri ekipi igra in izberemo prve 3 po točkah v tej ekipi, ki niso poškodovani. Če je naš igralec med prvmi tremi, vrnemo druga dva, če ga ni, ni zanimiv. Isto ponovimo še za asistence in skoke
@@ -117,7 +116,7 @@ def izbire_igralec(poskodovan):
     cur.execute("SELECT * from igralec")
     igralci=cur
     cur=baza.cursor()
-    cur.execute(f"""SELECT ekipa from igralec where ime = '{poskodovan}'""")
+    cur.execute("""SELECT ekipa from igralec where ime = %s""",(poskodovan,))
     ekipa=cur.fetchall()[0][0]
     igralciT=poizvedbe.izbire(ekipa, baza,poskodovan, 'tocke')
     igralciA=poizvedbe.izbire(ekipa, baza,poskodovan, 'asistence')
@@ -152,7 +151,7 @@ def igralci(sort):
 def poskodba_get():
     uporabnik=preveriUporabnika()
     cur=baza.cursor()
-    cur.execute(f"""SELECT igralec.ime, ekipa.ime, cas  FROM poskodba JOIN igralec ON igralec.ime = poskodba.ime JOIN ekipa on ekipa.kratica=igralec.ekipa""")
+    cur.execute("""SELECT igralec.ime, ekipa.ime, cas  FROM poskodba JOIN igralec ON igralec.ime = poskodba.ime JOIN ekipa on ekipa.kratica=igralec.ekipa""")
     baza.commit()
     return template('html/poskodba.html',poskodba=cur, napaka=nastaviSporocilo(), uporabnik=uporabnik,admin=je_admin())
 
@@ -165,10 +164,10 @@ def uporabnik_get():
     uporabnik=preveriUporabnika()
     if uporabnik:
         cur=baza.cursor()
-        cur.execute(f"""SELECT ime,kratica from ekipa left join najljubse on najljubse.ekipa=ekipa.kratica where clovek!='{uporabnik}' or clovek is null""")
+        cur.execute("""SELECT ime,kratica from ekipa left join najljubse on najljubse.ekipa=ekipa.kratica where clovek!=%s or clovek is null""",(uporabnik,))
         ekipe = cur
         cur=baza.cursor()
-        cur.execute(f"""SELECT ekipa.ime, ekipa FROM najljubse JOIN oseba ON najljubse.clovek = oseba.username JOIN ekipa on ekipa.kratica=najljubse.ekipa WHERE username='{uporabnik}'""")
+        cur.execute("""SELECT ekipa.ime, ekipa FROM najljubse JOIN oseba ON najljubse.clovek = oseba.username JOIN ekipa on ekipa.kratica=najljubse.ekipa WHERE username=%s""", (uporabnik,))
         najljubse = cur
         top3TAS=poizvedbe.top3tas(baza,uporabnik)
         baza.commit()
@@ -187,11 +186,11 @@ def uporabnik_ekipa_dodaj(ekipa):
     uporabnik=preveriUporabnika()
     cur=baza.cursor()
     try:
-        cur.execute(f"""insert into najljubse (clovek, ekipa) values ('{uporabnik}', '{ekipa}')""")
+        cur.execute("""insert into najljubse (clovek, ekipa) values (%s,%s)""",(uporabnik, ekipa))
         baza.commit()
     except:
         #nastavimo sporocilo
-        nastaviSporocilo(f"{ekipa} ni ime ekipe")
+        nastaviSporocilo(f"""{ekipa} ni ime ekipe""")
     redirect(url('uporabnik_get'))
     
 #<ekipa> nam da vrednost ekipe pri brisi
@@ -200,7 +199,7 @@ def uporabnik_ekipa_dodaj(ekipa):
 def uporabnik_ekipa(ekipa):
     uporabnik=preveriUporabnika()
     cur=baza.cursor()
-    cur.execute(f"""delete from najljubse where clovek='{uporabnik}' and ekipa='{ekipa}'""")
+    cur.execute("""delete from najljubse where clovek=%s and ekipa=%s""",(uporabnik, ekipa))
     baza.commit()
     redirect(url('uporabnik_get'))
     
@@ -216,7 +215,7 @@ def administrator_get():
     cur.execute("""SELECT * from oseba where username!='filip';""")
     osebe=cur.fetchall()
     cur=baza.cursor()
-    cur.execute(f"SELECT * from ekipa")
+    cur.execute("SELECT * from ekipa")
     ekipe=cur.fetchall()
     baza.commit()
     datum=datum=datetime.now().strftime("%Y-%m-%d")
@@ -231,7 +230,7 @@ def administrator_post():
     gosti = request.forms.gosti
     datum = request.forms.datum
     cur=baza.cursor()
-    cur.execute(f"""INSERT into tekme (ekipa1, ekipa2, cas) values ('{domaci}', '{gosti}', '{datum}')""")
+    cur.execute("""INSERT into tekme (ekipa1, ekipa2, cas) values (%s, %s, %s)""",(domaci, gosti, datum))
     nastaviSporocilo("Uspešno dodana tekma")
     baza.commit()
     redirect(url('administrator_get'))
@@ -249,7 +248,7 @@ def administrator_refresh():
 @aliNekaj(je_admin)
 def administrator_uporabnik(uporabnik):
     cur=baza.cursor()
-    cur.execute(f"""DELETE from oseba where username='{uporabnik}'""")
+    cur.execute("""DELETE from oseba where username=%s""",(uporabnik,))
     baza.commit()
     redirect(url('administrator_get'))
 
@@ -276,7 +275,7 @@ def prijava_post():
     # pogledamo, ce je uporabnik v bazi
     try:
         cur=baza.cursor()
-        cur.execute(f"""SELECT geslo FROM oseba WHERE username =  '{username}'""")
+        cur.execute("""SELECT geslo FROM oseba WHERE username =  %s""",(username,))
         gesloHash=cur.fetchone()[0]
         baza.commit()
     except:
@@ -363,7 +362,7 @@ def preveriUporabnika():
         uporabnik = None
         #poisce username v tabeli oseba
         try:
-            c.execute(f"""SELECT * from oseba WHERE username = '{username}'""")
+            c.execute("""SELECT * from oseba WHERE username = %s""", (username,))
             uporabnik = c
             baza.commit()
         except:
